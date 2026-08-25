@@ -3,20 +3,12 @@ PORT=3001
 NODE_ENV=development
 
 # MongoDB Configuration
-# MONGODB_URI=mongodb://localhost:27017/auth-service
-# Or for MongoDB Atlas:
-MONGO_URI=mongodb+srv://aditta_saikat:penguin007@cluster0.2jxyc6x.mongodb.net/auth-service?retryWrites=true&w=majority&appName=Cluster0
-
-# JWT Configuration
-JWT_ACCESS_SECRET=your_super_secret_access_key_change_this_in_production
-JWT_REFRESH_SECRET=your_super_secret_refresh_key_change_this_in_production
-JWT_ACCESS_EXPIRY=15m
-JWT_REFRESH_EXPIRY=7d
+MONGODB_URI=mongodb+srv://aditta_saikat:penguin007@cluster0.2jxyc6x.mongodb.net/e-commerce?retryWrites=true&w=majority&appName=Cluster0
 
 # Firebase Configuration
-FIREBASE_PROJECT_ID=your-firebase-project-id
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour_Private_Key_Here\n-----END PRIVATE KEY-----\n"
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
+FIREBASE_PROJECT_ID=e-commerce-15f66
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCkGzl+MyqBuk1G\n2YJ0VbIxjRKHzegWvptKSmxsa+dY1tawjqbi5wAjIqhPmOCST+BO0qpKaTpr4dFF\nv7qK4s6Ul0gMMEM6Fr2vv+gtpmDH3RrfebCtIi7Go2iiwv9F4Smen0YMsjywCuXG\nVv5bASHilEUBYAOwKjZFVFe0zaUY9qFD0kc+NB9pbfcPpr8r+VNxFyBGXiE/saTq\nMF0ugINZXCQsrttR/YcOc1gaLwFbCdbTffVaQqqP6LgKwkMzrW0jx6KbAYZFLDTd\nIOFZMvftxXTdHwCZpnZfg08hEanaZ8od7ubQWlEgXGsQzN8KrPSwGuclKoAI5WGZ\nYpxXyL8vAgMBAAECggEANs1Gok+44rCRzNanG21gv+5h4UsQNcQ6PJFk6sIP9Flu\nQXCp530HzTPuLAKcABA/kmMEbiv8z/kNtzKjO20pWnK4oyVc1eGxP6chBFma2TOL\nnVRYfUC8iSYZs7zVnYLnMKr0rBm7bXh+KgF0GHTk2XL1JlPnd2VpUTaswVqpRw/Q\nRODnfcBtoz6dpdBrodoIhWtvqh0rWz65mA5B7mXfi6ykfsUf7i4nVpUvF34FdjSm\nwdQhs6FeNISkXMiNgSmX3sPRBXnIxomcpdGJSvDRfKH6jH/xwOs9AmBa6G588l2b\nPvNI5nq68A5010Fa0fuhurSqXpD576tSDMSsQ42TzQKBgQDZEDDAK2+GbIWn6uFd\n7I/SDCjYfUXYUGGSnPnbbKt1FVSWH1QgENyPZVvoVHWqYk7Cw7aTtKTm8zRaVBgD\n+BMh60tEuolv6femRlRB7XvX1ttO71TT1voukA/jSvZ/l3fPlH9MrhVF+aQi39fZ\nWyWwvZtXK2MJpuQ7oaYXJFjiJQKBgQDBizBLQ3PsSy01CUUex+HFqm+xHl0lnDJz\nOj9hHrpqeXvUUAt69PqPLw9PktnyQvRNPOz23Ze09PHKKNfB8m3xf6TP+uI8ozh/\nLcMDHFwlIbAuK3mo5iaa8nlXsjndrOzuIxotynl6OBRtoDOShDnKxwVXx4kTPbvz\nYcfvux15wwKBgB/fP7lH53VOhAWW+IaJEMkf3fOD2XicvOcBQ7LTbw2fFy9/5CNd\nNnWbxXYEyM4+5x+0Cx//G2OJ/Hry9B/JEk4dtYye80VKjoGMvBx+GXwk4Uji3YrJ\neyzRHHQccrtja0VAobyJpzgCIva39YLF3m/oN2ICTeWB6utSngex35c9AoGAAUph\nTw8rFbdGnOTr7hGdIslJJ2AxdM++0l/gDlC7I3yd48OI4BAEH7JLotcy1te1c1Jl\nrhu6KD294wA0uBlavFKCkdR1b7wS4141v66PurunxhcKH6MxPLVDM99/XUgK6GeZ\nhBamircXA8ger+przDtZgMVW16cAutW7FJEl2CsCgYEAuxSCMjfC5eFOV2+aRWQm\nWuC/iVvUy+4kq9bZqHKe03WkTlrp9qN8AiIB1HSdirViMnVk5pnQyDjYwPb29DrU\n5/GYUc5vr8dVMQfxZ2Woqx3PHGpux+pe9NwdqAauHlI7RuGpmPoPvI0aon485YX8\noshzZDU2o34DKL4edrnTRzY=\n-----END PRIVATE KEY-----\n"
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc@e-commerce-15f66.iam.gserviceaccount.com
 
 # CORS Configuration
 ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
@@ -24,19 +16,3 @@ ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
 # Rate Limiting
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
-```
-
----
-
-## 2. .gitignore
-```
-node_modules/
-.env
-.env.local
-.env.production
-*.log
-.DS_Store
-dist/
-build/
-coverage/
-firebase-service-account.json
