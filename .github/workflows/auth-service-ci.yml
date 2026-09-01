@@ -1,0 +1,59 @@
+name: auth-service CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'auth-service/**'
+      - '.github/workflows/auth-service-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'auth-service/**'
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/auth-service
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: auth-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: auth-service/package-lock.json
+
+      - run: npm ci
+      - run: npm test
+
+  build-and-push:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: auth-service
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
