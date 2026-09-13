@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { Package } from 'lucide-react'
 import { getProduct } from '../api/products'
 
 const formatPrice = (minorUnits, currency) =>
@@ -26,14 +27,27 @@ const ProductDetail = () => {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-8">
-      <div className="mb-6 aspect-video rounded-lg bg-linear-to-br from-indigo-100 to-cyan-100" />
-      <h1 className="text-2xl font-semibold text-slate-900">{product.name}</h1>
-      <p className="mt-1 text-sm text-slate-500">{product.category}</p>
-      <p className="mt-4 text-xl font-semibold text-indigo-600">
+      <div className="mb-6 flex aspect-video items-center justify-center rounded-xl bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-300">
+        <Package size={56} strokeWidth={1.5} />
+      </div>
+
+      <span className="mb-2 inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 capitalize">
+        {product.category}
+      </span>
+
+      <h1 className="font-display text-2xl font-bold text-slate-900">{product.name}</h1>
+
+      <p className="mt-4 text-2xl font-bold text-indigo-600">
         {formatPrice(product.price, product.currency)}
       </p>
-      <p className="mt-4 text-sm text-slate-500">{product.stock} in stock</p>
-      {product.description && <p className="mt-4 text-slate-700">{product.description}</p>}
+
+      <p className="mt-2 text-sm text-slate-500">
+        {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+      </p>
+
+      {product.description && (
+        <p className="mt-6 leading-relaxed text-slate-700">{product.description}</p>
+      )}
     </div>
   )
 }
