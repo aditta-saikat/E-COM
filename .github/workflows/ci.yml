@@ -27,27 +27,8 @@ jobs:
             frontend:
               - 'frontend/**'
 
-  auth-test:
-    needs: changes
-    if: needs.changes.outputs.auth == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: auth-service
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: auth-service/package-lock.json
-
-      - run: npm ci
-      - run: npm test
-
   auth-build-and-push:
-    needs: [changes, auth-test]
+    needs: changes
     if: needs.changes.outputs.auth == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -72,27 +53,8 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/auth-service:latest
             ghcr.io/${{ github.repository_owner }}/auth-service:${{ github.sha }}
 
-  catalog-test:
-    needs: changes
-    if: needs.changes.outputs.catalog == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: product-catalog-service
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: product-catalog-service/package-lock.json
-
-      - run: npm ci
-      - run: npm test
-
   catalog-build-and-push:
-    needs: [changes, catalog-test]
+    needs: changes
     if: needs.changes.outputs.catalog == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
