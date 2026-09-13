@@ -1,5 +1,5 @@
-const { getFirebaseAuth } = require('../config/firebase');
-const { getOrCreateUser } = require('../services/user.service');
+const { verifyAccessToken } = require('../config/jwt');
+const { getUserById } = require('../services/user.service');
 
 const requireAuth = async (req, res, next) => {
   try {
@@ -9,9 +9,15 @@ const requireAuth = async (req, res, next) => {
       return res.status(401).json({ error: 'A Bearer token is required' });
     }
 
-    const idToken = authorization.slice('Bearer '.length);
-    const firebaseUser = await getFirebaseAuth().verifyIdToken(idToken);
-    req.user = await getOrCreateUser(firebaseUser);
+    const token = authorization.slice('Bearer '.length);
+    const decoded = verifyAccessToken(token);
+    const user = await getUserById(decoded.sub);
+
+    if (!user || !user.isActive) {
+      return res.status(401).json({ error: 'Invalid or expired authentication token' });
+    }
+
+    req.user = user;
 
     return next();
   } catch (error) {
