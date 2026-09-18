@@ -3,9 +3,9 @@ import { Package, PackagePlus, PackageX } from 'lucide-react'
 import { createProduct, deleteProduct, listProducts, updateProduct } from '../api/products'
 import { useAuth } from '../context/AuthContext'
 
-const emptyForm = { name: '', description: '', price: '', sku: '', stock: '', category: '' }
+const emptyForm = { name: '', description: '', price: '', sku: '', stock: '', category: '', imageUrl: '' }
 
-const inputClass = 'rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100'
+const inputClass = 'rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder-slate-500'
 
 const MyProducts = () => {
   const { currentUser } = useAuth()
@@ -38,6 +38,7 @@ const MyProducts = () => {
       sku: form.sku,
       stock: Number(form.stock || 0),
       category: form.category,
+      images: form.imageUrl.trim() ? [form.imageUrl.trim()] : [],
     }
 
     try {
@@ -68,6 +69,7 @@ const MyProducts = () => {
       sku: product.sku,
       stock: String(product.stock),
       category: product.category,
+      imageUrl: product.images?.[0] || '',
     })
   }
 
@@ -83,14 +85,14 @@ const MyProducts = () => {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-8">
-      <h1 className="font-display mb-6 text-2xl font-bold text-slate-900">My products</h1>
+      <h1 className="font-display mb-6 text-2xl font-bold text-slate-900 dark:text-slate-100">My products</h1>
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+        className="mb-8 animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
       >
-        <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700">
-          <PackagePlus size={16} className="text-indigo-600" />
+        <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+          <PackagePlus size={16} className="text-indigo-600 dark:text-indigo-400" />
           {editingId ? 'Edit product' : 'New product'}
         </div>
 
@@ -108,10 +110,11 @@ const MyProducts = () => {
           />
           <input type="number" min="0" placeholder="Stock" value={form.stock} onChange={handleChange('stock')} className={inputClass} />
           <input placeholder="Category" value={form.category} onChange={handleChange('category')} className={inputClass} />
-          <input placeholder="Description" value={form.description} onChange={handleChange('description')} className={inputClass} />
+          <input placeholder="Image URL" value={form.imageUrl} onChange={handleChange('imageUrl')} className={inputClass} />
+          <input placeholder="Description" value={form.description} onChange={handleChange('description')} className={`${inputClass} col-span-2`} />
         </div>
 
-        {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
+        {error && <p className="mt-3 text-sm text-rose-600 dark:text-rose-400">{error}</p>}
 
         <div className="mt-4 flex gap-3">
           <button
@@ -124,7 +127,7 @@ const MyProducts = () => {
             <button
               type="button"
               onClick={handleCancelEdit}
-              className="rounded-lg border border-slate-300 px-4 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+              className="rounded-lg border border-slate-300 px-4 text-sm font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               Cancel
             </button>
@@ -133,20 +136,28 @@ const MyProducts = () => {
       </form>
 
       {products.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 py-16 text-center">
-          <PackageX size={32} className="text-slate-300" />
-          <p className="text-sm text-slate-500">You haven't added any products yet.</p>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 py-16 text-center dark:border-slate-700">
+          <PackageX size={32} className="text-slate-300 dark:text-slate-700" />
+          <p className="text-sm text-slate-500 dark:text-slate-400">You haven't added any products yet.</p>
         </div>
       ) : (
-        <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
           {products.map((product) => (
             <li key={product._id} className="flex items-center gap-4 px-5 py-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-400">
-                <Package size={18} />
-              </div>
+              {product.images?.[0] ? (
+                <img
+                  src={product.images[0]}
+                  alt=""
+                  className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                />
+              ) : (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-400 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-500">
+                  <Package size={18} />
+                </div>
+              )}
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-slate-900">{product.name}</p>
-                <p className="text-sm text-slate-500">
+                <p className="truncate font-medium text-slate-900 dark:text-slate-100">{product.name}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   {product.stock} in stock · {product.sku}
                 </p>
               </div>
@@ -154,14 +165,14 @@ const MyProducts = () => {
                 <button
                   type="button"
                   onClick={() => handleEdit(product)}
-                  className="text-indigo-600 hover:text-indigo-500"
+                  className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
                   Edit
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDelete(product._id)}
-                  className="text-rose-600 hover:text-rose-500"
+                  className="text-rose-600 hover:text-rose-500 dark:text-rose-400 dark:hover:text-rose-300"
                 >
                   Delete
                 </button>

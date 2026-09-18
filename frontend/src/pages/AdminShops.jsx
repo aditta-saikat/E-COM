@@ -33,35 +33,35 @@ const AdminShops = () => {
   return (
     <div className="mx-auto max-w-3xl px-6 py-8">
       <div className="mb-6 flex items-center gap-2">
-        <ShieldCheck size={22} className="text-rose-600" />
-        <h1 className="font-display text-2xl font-bold text-slate-900">Pending shop requests</h1>
+        <ShieldCheck size={22} className="text-rose-600 dark:text-rose-400" />
+        <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-100">Pending shop requests</h1>
       </div>
 
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
 
       {shops.length === 0 && !error && (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 py-16 text-center">
-          <Store size={32} className="text-slate-300" />
-          <p className="text-sm text-slate-500">No pending requests right now.</p>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 py-16 text-center dark:border-slate-700">
+          <Store size={32} className="text-slate-300 dark:text-slate-700" />
+          <p className="text-sm text-slate-500 dark:text-slate-400">No pending requests right now.</p>
         </div>
       )}
 
       {shops.length > 0 && (
-        <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
           {shops.map((shop) => (
             <li key={shop._id} className="flex items-center gap-4 px-5 py-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-500">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-500 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-400">
                 <Store size={18} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-slate-900">{shop.name}</p>
-                <p className="truncate text-sm text-slate-500">{shop.description || 'No description'}</p>
+                <p className="truncate font-medium text-slate-900 dark:text-slate-100">{shop.name}</p>
+                <p className="truncate text-sm text-slate-500 dark:text-slate-400">{shop.description || 'No description'}</p>
               </div>
               <div className="flex shrink-0 gap-2">
                 <button
                   type="button"
                   onClick={() => handleApprove(shop._id)}
-                  className="flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
+                  className="flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
                 >
                   <Check size={14} />
                   Approve
@@ -69,7 +69,7 @@ const AdminShops = () => {
                 <button
                   type="button"
                   onClick={() => handleReject(shop._id)}
-                  className="flex items-center gap-1 rounded-lg bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-700 transition hover:bg-rose-100"
+                  className="flex items-center gap-1 rounded-lg bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-700 transition hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-300 dark:hover:bg-rose-500/20"
                 >
                   <X size={14} />
                   Reject

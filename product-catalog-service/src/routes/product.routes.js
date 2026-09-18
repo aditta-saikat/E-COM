@@ -13,6 +13,7 @@ const productValidationRules = [
   body('sku').isString().trim().notEmpty(),
   body('stock').optional().isInt({ min: 0 }),
   body('category').optional().isString().trim(),
+  body('images').optional().isArray(),
 ];
 
 const stockAdjustmentRules = [body('quantity').isInt({ min: 1 })];

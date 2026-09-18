@@ -12,7 +12,9 @@ import { useAuth } from '../context/AuthContext'
 
 const linkClass = ({ isActive }) =>
   `flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition ${
-    isActive ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+    isActive
+      ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
+      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
   }`
 
 const Navbar = () => {
@@ -25,13 +27,13 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="sticky top-0 z-10 border-b border-slate-200/80 bg-white/70 backdrop-blur-lg">
+    <nav className="sticky top-0 z-10 border-b border-slate-200/80 bg-white/70 backdrop-blur-lg dark:border-slate-800/80 dark:bg-slate-950/70">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <NavLink to="/" className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-indigo-600 to-cyan-600 text-white shadow-sm shadow-indigo-600/40">
             <ShoppingBag size={17} strokeWidth={2.25} />
           </span>
-          <span className="font-display text-lg font-bold tracking-tight text-slate-900">
+          <span className="font-display text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
             E-COM
           </span>
         </NavLink>
@@ -80,7 +82,7 @@ const Navbar = () => {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="ml-2 flex items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+                className="ml-2 flex items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
               >
                 <LogOut size={15} />
                 <span className="hidden sm:inline">Log out</span>
