@@ -47,10 +47,10 @@ const Landing = () => (
       </div>
     </div>
 
-    <div className="flex flex-col items-center justify-center bg-slate-50 px-8 py-16 sm:px-16">
+    <div className="flex flex-col items-center justify-center bg-slate-50 px-8 py-16 sm:px-16 dark:bg-slate-950">
       <div className="w-full max-w-sm animate-fade-in-up text-center">
-        <h2 className="font-display text-2xl font-bold text-slate-900">Welcome</h2>
-        <p className="mt-2 text-slate-500">Sign in to your account or create a new one.</p>
+        <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-100">Welcome</h2>
+        <p className="mt-2 text-slate-500 dark:text-slate-400">Sign in to your account or create a new one.</p>
 
         <div className="mt-8 flex flex-col gap-3">
           <Link
@@ -62,7 +62,7 @@ const Landing = () => (
           </Link>
           <Link
             to="/signup"
-            className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100"
+            className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800"
           >
             Create an account
           </Link>
@@ -70,7 +70,7 @@ const Landing = () => (
 
         <Link
           to="/products"
-          className="mt-6 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500"
+          className="mt-6 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
         >
           Browse products as a guest →
         </Link>

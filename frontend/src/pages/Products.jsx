@@ -9,7 +9,7 @@ const SORT_OPTIONS = [
   { value: 'price-desc', label: 'Price: high to low' },
 ]
 
-const selectClass = 'w-full appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pr-9 pl-9 text-sm text-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 sm:w-48'
+const selectClass = 'w-full appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pr-9 pl-9 text-sm text-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 sm:w-48 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
 
 const sortProducts = (items, sortBy) => {
   if (sortBy === 'price-asc') return [...items].sort((a, b) => a.price - b.price)
@@ -57,9 +57,9 @@ const Products = () => {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
-      <h1 className="font-display mb-6 text-2xl font-bold text-slate-900">Browse products</h1>
+      <h1 className="font-display mb-6 text-2xl font-bold text-slate-900 dark:text-slate-100">Browse products</h1>
 
-      <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
+      <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900">
         <div className="relative flex-1">
           <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
           <input
@@ -67,7 +67,7 @@ const Products = () => {
             placeholder="Search products..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 py-2.5 pr-3 pl-9 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+            className="w-full rounded-lg border border-slate-300 py-2.5 pr-3 pl-9 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder-slate-500"
           />
         </div>
 
@@ -106,7 +106,7 @@ const Products = () => {
       </div>
 
       {!loading && !error && (
-        <p className="mb-4 text-sm text-slate-500">
+        <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
           {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'} found
         </p>
       )}
@@ -116,24 +116,24 @@ const Products = () => {
           {Array.from({ length: 8 }).map((_, index) => (
             <div
               key={index}
-              className="animate-pulse overflow-hidden rounded-xl border border-slate-200 bg-white"
+              className="animate-pulse overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
             >
-              <div className="aspect-square bg-slate-100" />
+              <div className="aspect-square bg-slate-100 dark:bg-slate-800" />
               <div className="space-y-2 p-4">
-                <div className="h-3 w-3/4 rounded bg-slate-100" />
-                <div className="h-3 w-1/2 rounded bg-slate-100" />
+                <div className="h-3 w-3/4 rounded bg-slate-100 dark:bg-slate-800" />
+                <div className="h-3 w-1/2 rounded bg-slate-100 dark:bg-slate-800" />
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
 
       {!loading && !error && sortedProducts.length === 0 && (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 py-16 text-center">
-          <PackageSearch size={32} className="text-slate-300" />
-          <p className="text-sm text-slate-500">No products found.</p>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 py-16 text-center dark:border-slate-700">
+          <PackageSearch size={32} className="text-slate-300 dark:text-slate-700" />
+          <p className="text-sm text-slate-500 dark:text-slate-400">No products found.</p>
         </div>
       )}
 

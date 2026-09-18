@@ -30,13 +30,13 @@ const Signup = () => {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-slate-50 px-6">
-      <div className="w-full max-w-sm animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="flex flex-1 items-center justify-center bg-slate-50 px-6 dark:bg-slate-950">
+      <div className="w-full max-w-sm animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-linear-to-br from-indigo-600 to-cyan-600 text-white shadow-sm shadow-indigo-600/30">
           <UserPlus size={19} />
         </div>
-        <h1 className="font-display text-xl font-bold text-slate-900">Create an account</h1>
-        <p className="mt-1 text-sm text-slate-500">Join E-COM to start buying and selling.</p>
+        <h1 className="font-display text-xl font-bold text-slate-900 dark:text-slate-100">Create an account</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Join E-COM to start buying and selling.</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div className="relative">
@@ -47,7 +47,7 @@ const Signup = () => {
               placeholder="Email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 py-2.5 pr-3 pl-9 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              className="w-full rounded-lg border border-slate-300 py-2.5 pr-3 pl-9 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder-slate-500"
             />
           </div>
           <div className="relative">
@@ -59,11 +59,11 @@ const Signup = () => {
               placeholder="Password (min. 6 characters)"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 py-2.5 pr-3 pl-9 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              className="w-full rounded-lg border border-slate-300 py-2.5 pr-3 pl-9 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder-slate-500"
             />
           </div>
 
-          {error && <p className="text-sm text-rose-600">{error}</p>}
+          {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
 
           <button
             type="submit"
@@ -75,9 +75,9 @@ const Signup = () => {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
           Already have an account?{' '}
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
             Log in
           </Link>
         </p>
