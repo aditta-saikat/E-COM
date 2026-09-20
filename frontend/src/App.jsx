@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import { PullCord } from 'pullcord'
 import 'pullcord/pullcord.css'
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
 import RoleRoute from './components/RoleRoute'
 import LoadingScreen from './components/LoadingScreen'
@@ -70,6 +71,8 @@ const App = () => {
           </Routes>
         </Suspense>
       </main>
+
+      <Footer />
     </div>
   )
 }

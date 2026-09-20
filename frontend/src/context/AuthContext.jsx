@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import * as authApi from '../api/auth'
-import { getCurrentUserProfile } from '../api/users'
+import { getCurrentUserProfile, updateCurrentUserProfile } from '../api/users'
 import { clearToken, getToken, setToken } from '../lib/token'
 
 const AuthContext = createContext(null)
@@ -38,8 +38,14 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(null)
   }
 
+  const updateProfile = async (updates) => {
+    const user = await updateCurrentUserProfile(updates)
+    setCurrentUser(user)
+    return user
+  }
+
   return (
-    <AuthContext.Provider value={{ currentUser, loading, signup, login, logout }}>
+    <AuthContext.Provider value={{ currentUser, loading, signup, login, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )

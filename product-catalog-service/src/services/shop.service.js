@@ -1,5 +1,6 @@
 const Shop = require('../models/shop.model');
 const authServiceClient = require('./authService.client');
+const logger = require('../config/logger');
 
 const listApprovedShops = async () => Shop.find({ status: 'approved' }).sort({ createdAt: -1 });
 
@@ -51,7 +52,15 @@ const approveShop = async (id) => {
   shop.rejectionReason = '';
   await shop.save();
 
-  await authServiceClient.setUserRole(shop.ownerId, 'shop_admin');
+  try {
+    await authServiceClient.setUserRole(shop.ownerId, 'shop_admin');
+  } catch (error) {
+    logger.error(
+      { err: error, shopId: shop._id, ownerId: shop.ownerId },
+      'Shop marked approved but role sync to auth-service failed - owner will not have shop_admin permissions until this is retried',
+    );
+    throw error;
+  }
 
   return { shop };
 };
