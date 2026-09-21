@@ -1,12 +1,18 @@
 const cors = require('cors');
 const express = require('express');
 const helmet = require('helmet');
+const pinoHttp = require('pino-http');
 
+const logger = require('./config/logger');
 const productRoutes = require('./routes/product.routes');
 const shopRoutes = require('./routes/shop.routes');
 
 const app = express();
 
+app.use(pinoHttp({
+  logger,
+  autoLogging: { ignore: (req) => req.url === '/health' },
+}));
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
@@ -26,7 +32,7 @@ app.use((req, res) => {
 });
 
 app.use((error, req, res, next) => {
-	console.error(error);
+	req.log.error({ err: error }, 'Unhandled error');
 	res.status(500).json({ error: 'Internal server error' });
 });
 

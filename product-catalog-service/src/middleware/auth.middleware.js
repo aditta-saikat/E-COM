@@ -18,12 +18,14 @@ const requireAuth = (req, res, next) => {
 
     return next();
   } catch (error) {
+    req.log.debug({ err: error }, 'Token verification failed');
     return res.status(401).json({ error: 'Invalid or expired authentication token' });
   }
 };
 
 const requireRole = (...allowedRoles) => (req, res, next) => {
   if (!req.user || !allowedRoles.includes(req.user.role)) {
+    req.log.warn({ userId: req.user?.uid, role: req.user?.role, path: req.path }, 'Forbidden: role not permitted');
     return res.status(403).json({ error: 'You do not have permission to access this resource' });
   }
 

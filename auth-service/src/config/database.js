@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logger = require('./logger');
 
 const connectDB = async () => {
   if (!process.env.MONGODB_URI) {
@@ -8,21 +9,19 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
 
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    
-    // Handle connection events
+    logger.info({ host: conn.connection.host }, 'MongoDB connected');
+
     mongoose.connection.on('error', (err) => {
-      console.error('❌ MongoDB connection error:', err);
+      logger.error({ err }, 'MongoDB connection error');
     });
 
     mongoose.connection.on('disconnected', () => {
-      console.warn('⚠️  MongoDB disconnected');
+      logger.warn('MongoDB disconnected');
     });
 
-    // Graceful shutdown
     process.on('SIGINT', async () => {
       await mongoose.connection.close();
-      console.log('MongoDB connection closed due to app termination');
+      logger.info('MongoDB connection closed due to app termination');
       process.exit(0);
     });
 

@@ -20,9 +20,12 @@ const signup = async (req, res, next) => {
     const user = await createUser({ email, password, displayName });
     const token = signAccessToken(user);
 
+    req.log.info({ userId: user._id, email }, 'User signed up');
+
     return res.status(201).json({ token, user: toSafeUser(user) });
   } catch (error) {
     if (error.code === 11000) {
+      req.log.warn({ email: req.body.email }, 'Signup rejected: email already in use');
       return res.status(409).json({ error: 'An account with this email already exists' });
     }
 
@@ -41,10 +44,13 @@ const login = async (req, res, next) => {
     const user = await verifyCredentials(email, password);
 
     if (!user) {
+      req.log.warn({ email }, 'Login failed: invalid credentials');
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     const token = signAccessToken(user);
+
+    req.log.info({ userId: user._id, email }, 'User logged in');
 
     return res.status(200).json({ token, user: toSafeUser(user) });
   } catch (error) {
