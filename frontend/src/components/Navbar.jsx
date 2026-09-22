@@ -1,14 +1,17 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
+  ClipboardList,
   LayoutDashboard,
   LogOut,
   Package,
   Shield,
   ShoppingBag,
+  ShoppingCart,
   Store,
   UserCircle,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 
 const linkClass = ({ isActive }) =>
   `flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition ${
@@ -19,6 +22,7 @@ const linkClass = ({ isActive }) =>
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth()
+  const { itemCount } = useCart()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -67,12 +71,29 @@ const Navbar = () => {
                 </NavLink>
               )}
 
-              {(currentUser.role === 'shop_admin' || currentUser.role === 'admin') && (
+              {currentUser.role === 'shop_admin' && (
                 <NavLink to="/my-products" className={linkClass}>
                   <Package size={16} />
                   <span className="hidden sm:inline">My products</span>
                 </NavLink>
               )}
+
+              <NavLink to="/orders" className={linkClass}>
+                <ClipboardList size={16} />
+                <span className="hidden sm:inline">Orders</span>
+              </NavLink>
+
+              <NavLink to="/cart" className={linkClass}>
+                <span className="relative">
+                  <ShoppingCart size={16} />
+                  {itemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-[10px] font-semibold text-white">
+                      {itemCount}
+                    </span>
+                  )}
+                </span>
+                <span className="hidden sm:inline">Cart</span>
+              </NavLink>
 
               <NavLink to="/profile" className={linkClass}>
                 <UserCircle size={16} />

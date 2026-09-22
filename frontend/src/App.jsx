@@ -18,6 +18,11 @@ const Profile = lazy(() => import('./pages/Profile'))
 const MyProducts = lazy(() => import('./pages/MyProducts'))
 const MyShop = lazy(() => import('./pages/MyShop'))
 const AdminShops = lazy(() => import('./pages/AdminShops'))
+const AdminShopProducts = lazy(() => import('./pages/AdminShopProducts'))
+const Cart = lazy(() => import('./pages/Cart'))
+const Checkout = lazy(() => import('./pages/Checkout'))
+const Orders = lazy(() => import('./pages/Orders'))
+const OrderDetail = lazy(() => import('./pages/OrderDetail'))
 
 const App = () => {
   const { dark, toggleDark } = useTheme()
@@ -55,7 +60,7 @@ const App = () => {
             <Route
               path="/my-products"
               element={
-                <RoleRoute roles={['shop_admin', 'admin']}>
+                <RoleRoute roles={['shop_admin']}>
                   <MyProducts />
                 </RoleRoute>
               }
@@ -66,6 +71,46 @@ const App = () => {
                 <RoleRoute roles={['admin']}>
                   <AdminShops />
                 </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/shops/:shopId"
+              element={
+                <RoleRoute roles={['admin']}>
+                  <AdminShopProducts />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders/:id"
+              element={
+                <ProtectedRoute>
+                  <OrderDetail />
+                </ProtectedRoute>
               }
             />
           </Routes>

@@ -1,8 +1,8 @@
 import { catalogClient } from './client'
 
-export const listProducts = async ({ search, category, page } = {}) => {
+export const listProducts = async ({ search, category, page, shopId } = {}) => {
   const response = await catalogClient.get('/api/products', {
-    params: { search, category, page },
+    params: { search, category, page, shopId },
   })
   return response.data
 }

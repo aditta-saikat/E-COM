@@ -19,3 +19,5 @@ const createServiceClient = (baseURL) => {
 
 export const authClient = createServiceClient(import.meta.env.VITE_AUTH_SERVICE_URL)
 export const catalogClient = createServiceClient(import.meta.env.VITE_PRODUCT_CATALOG_URL)
+export const cartClient = createServiceClient(import.meta.env.VITE_CART_SERVICE_URL)
+export const orderClient = createServiceClient(import.meta.env.VITE_ORDER_SERVICE_URL)
