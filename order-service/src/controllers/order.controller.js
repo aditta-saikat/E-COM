@@ -33,6 +33,12 @@ const listOrders = async (req, res) => {
   return res.status(200).json({ items: orders });
 };
 
+const listAllOrders = async (req, res) => {
+  const { status, shopId } = req.query;
+  const orders = await orderService.listAllOrders({ status, shopId });
+  return res.status(200).json({ items: orders });
+};
+
 const getOrder = async (req, res) => {
   const result = await orderService.getOrder(req.params.id, req.user.uid, req.user.role === 'admin');
 
@@ -47,4 +53,4 @@ const getOrder = async (req, res) => {
   return res.status(200).json(result.order);
 };
 
-module.exports = { createOrder, listOrders, getOrder };
+module.exports = { createOrder, listOrders, listAllOrders, getOrder };

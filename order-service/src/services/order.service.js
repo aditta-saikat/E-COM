@@ -94,6 +94,20 @@ const checkout = async (userId, bearerToken, shippingAddress) => {
 
 const listOrders = async (userId) => Order.find({ userId }).sort({ createdAt: -1 });
 
+const listAllOrders = async ({ status, shopId } = {}) => {
+  const filter = {};
+
+  if (status) {
+    filter.status = status;
+  }
+
+  if (shopId) {
+    filter['items.shopId'] = shopId;
+  }
+
+  return Order.find(filter).sort({ createdAt: -1 });
+};
+
 const getOrder = async (id, userId, isAdmin) => {
   const order = await Order.findById(id);
 
@@ -108,4 +122,4 @@ const getOrder = async (id, userId, isAdmin) => {
   return { order };
 };
 
-module.exports = { checkout, listOrders, getOrder };
+module.exports = { checkout, listOrders, listAllOrders, getOrder };

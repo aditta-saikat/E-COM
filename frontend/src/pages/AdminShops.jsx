@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { approveShop, listPendingShops, listShops, rejectShop } from '../api/shops'
 import { useAuth } from '../context/AuthContext'
+import AdminTabs from '../components/AdminTabs'
 
 const STATUS_META = {
   pending: { label: 'Pending', icon: Clock, className: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300' },
@@ -117,6 +118,8 @@ const AdminShops = () => {
         <ShieldCheck size={22} className="text-rose-600 dark:text-rose-400" />
         <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-100">Admin</h1>
       </div>
+
+      <AdminTabs />
 
       {error && stalePermissions && (
         <div className="mb-6 flex flex-col items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">

@@ -18,7 +18,9 @@ const Profile = lazy(() => import('./pages/Profile'))
 const MyProducts = lazy(() => import('./pages/MyProducts'))
 const MyShop = lazy(() => import('./pages/MyShop'))
 const AdminShops = lazy(() => import('./pages/AdminShops'))
-const AdminShopProducts = lazy(() => import('./pages/AdminShopProducts'))
+const AdminShopDetail = lazy(() => import('./pages/AdminShopDetail'))
+const AdminOrders = lazy(() => import('./pages/AdminOrders'))
+const AdminCarts = lazy(() => import('./pages/AdminCarts'))
 const Cart = lazy(() => import('./pages/Cart'))
 const Checkout = lazy(() => import('./pages/Checkout'))
 const Orders = lazy(() => import('./pages/Orders'))
@@ -77,7 +79,23 @@ const App = () => {
               path="/admin/shops/:shopId"
               element={
                 <RoleRoute roles={['admin']}>
-                  <AdminShopProducts />
+                  <AdminShopDetail />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/orders"
+              element={
+                <RoleRoute roles={['admin']}>
+                  <AdminOrders />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/carts"
+              element={
+                <RoleRoute roles={['admin']}>
+                  <AdminCarts />
                 </RoleRoute>
               }
             />

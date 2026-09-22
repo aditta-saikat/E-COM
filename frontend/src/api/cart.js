@@ -23,3 +23,8 @@ export const removeCartItem = async (productId) => {
 export const clearCart = async () => {
   await cartClient.delete('/api/cart')
 }
+
+export const listAllCarts = async ({ shopId } = {}) => {
+  const response = await cartClient.get('/api/cart/admin', { params: { shopId } })
+  return response.data
+}

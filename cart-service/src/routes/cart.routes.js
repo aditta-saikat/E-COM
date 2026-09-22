@@ -2,11 +2,12 @@ const { Router } = require('express');
 const { body } = require('express-validator');
 
 const cartController = require('../controllers/cart.controller');
-const { requireAuth } = require('../middleware/auth.middleware');
+const { requireAuth, requireRole } = require('../middleware/auth.middleware');
 
 const router = Router();
 
 router.get('/', requireAuth, cartController.getCart);
+router.get('/admin', requireAuth, requireRole('admin'), cartController.listAllCarts);
 router.post(
   '/items',
   requireAuth,

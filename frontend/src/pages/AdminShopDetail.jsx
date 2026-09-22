@@ -1,9 +1,24 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Calendar, Check, Clock, Package, Store, User, XCircle } from 'lucide-react'
+import {
+  ArrowLeft,
+  Calendar,
+  Check,
+  ClipboardList,
+  Clock,
+  Package,
+  ShoppingCart,
+  Store,
+  User,
+  XCircle,
+} from 'lucide-react'
 import { createProduct, deleteProduct, listProducts, updateProduct } from '../api/products'
 import { listShops } from '../api/shops'
+import { listAllOrders } from '../api/orders'
+import { listAllCarts } from '../api/cart'
 import ProductsManager from '../components/ProductsManager'
+import AdminOrdersTable from '../components/AdminOrdersTable'
+import AdminCartsTable from '../components/AdminCartsTable'
 
 const STATUS_META = {
   pending: { label: 'Pending', icon: Clock, className: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300' },
@@ -11,15 +26,24 @@ const STATUS_META = {
   rejected: { label: 'Rejected', icon: XCircle, className: 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300' },
 }
 
+const TABS = [
+  { key: 'products', label: 'Products', icon: Package },
+  { key: 'orders', label: 'Orders', icon: ClipboardList },
+  { key: 'cart', label: 'Cart', icon: ShoppingCart },
+]
+
 const formatDate = (isoDate) =>
   new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(isoDate))
 
-const AdminShopProducts = () => {
+const AdminShopDetail = () => {
   const { shopId } = useParams()
   const [shop, setShop] = useState(null)
   const [products, setProducts] = useState([])
+  const [orders, setOrders] = useState(null)
+  const [carts, setCarts] = useState(null)
+  const [tab, setTab] = useState('products')
 
-  const load = async () => {
+  const loadProducts = async () => {
     const [shopsResult, productsResult] = await Promise.all([
       listShops(),
       listProducts({ shopId }),
@@ -29,22 +53,38 @@ const AdminShopProducts = () => {
   }
 
   useEffect(() => {
-    load()
+    loadProducts()
+    setOrders(null)
+    setCarts(null)
   }, [shopId])
+
+  useEffect(() => {
+    if (tab === 'orders' && orders === null) {
+      listAllOrders({ shopId })
+        .then((data) => setOrders(data.items))
+        .catch(() => setOrders([]))
+    }
+
+    if (tab === 'cart' && carts === null) {
+      listAllCarts({ shopId })
+        .then((data) => setCarts(data.items))
+        .catch(() => setCarts([]))
+    }
+  }, [tab, shopId, orders, carts])
 
   const handleCreate = async (payload) => {
     await createProduct({ ...payload, shopId })
-    await load()
+    await loadProducts()
   }
 
   const handleUpdate = async (id, payload) => {
     await updateProduct(id, payload)
-    await load()
+    await loadProducts()
   }
 
   const handleDelete = async (id) => {
     await deleteProduct(id)
-    await load()
+    await loadProducts()
   }
 
   const statusMeta = shop ? STATUS_META[shop.status] : null
@@ -119,17 +159,49 @@ const AdminShopProducts = () => {
         </div>
       )}
 
-      <h2 className="font-display mb-4 text-lg font-bold text-slate-900 dark:text-slate-100">Products</h2>
+      <div className="mb-6 flex gap-1 rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
+        {TABS.map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setTab(key)}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition ${
+              tab === key
+                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
+                : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
+            }`}
+          >
+            <Icon size={15} />
+            {label}
+          </button>
+        ))}
+      </div>
 
-      <ProductsManager
-        products={products}
-        onCreate={handleCreate}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-        emptyMessage="This shop has no products yet."
-      />
+      {tab === 'products' && (
+        <ProductsManager
+          products={products}
+          onCreate={handleCreate}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+          emptyMessage="This shop has no products yet."
+        />
+      )}
+
+      {tab === 'orders' &&
+        (orders === null ? (
+          <p className="text-sm text-slate-500 dark:text-slate-400">Loading...</p>
+        ) : (
+          <AdminOrdersTable orders={orders} emptyMessage="This shop has no orders yet." />
+        ))}
+
+      {tab === 'cart' &&
+        (carts === null ? (
+          <p className="text-sm text-slate-500 dark:text-slate-400">Loading...</p>
+        ) : (
+          <AdminCartsTable carts={carts} emptyMessage="No one has this shop's products in their cart." />
+        ))}
     </div>
   )
 }
 
-export default AdminShopProducts
+export default AdminShopDetail

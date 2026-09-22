@@ -11,11 +11,9 @@ const getOrCreateCart = async (userId) => {
   return cart;
 };
 
-const getHydratedCart = async (userId) => {
-  const cart = await getOrCreateCart(userId);
-
+const hydrateItems = async (rawItems) => {
   const hydratedItems = await Promise.all(
-    cart.items.map(async (item) => {
+    rawItems.map(async (item) => {
       const product = await productCatalogClient.getProduct(item.productId);
 
       if (!product || !product.isActive) {
@@ -35,10 +33,44 @@ const getHydratedCart = async (userId) => {
     }),
   );
 
-  const items = hydratedItems.filter(Boolean);
+  return hydratedItems.filter(Boolean);
+};
+
+const getHydratedCart = async (userId) => {
+  const cart = await getOrCreateCart(userId);
+  const items = await hydrateItems(cart.items);
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return { items, subtotal };
+};
+
+const listAllCarts = async ({ shopId } = {}) => {
+  const carts = await Cart.find({ 'items.0': { $exists: true } }).sort({ updatedAt: -1 });
+
+  const hydrated = await Promise.all(
+    carts.map(async (cart) => {
+      const items = await hydrateItems(cart.items);
+      const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      return { userId: cart.userId, items, subtotal, updatedAt: cart.updatedAt };
+    }),
+  );
+
+  const withItems = hydrated.filter((cart) => cart.items.length > 0);
+
+  if (!shopId) {
+    return withItems;
+  }
+
+  return withItems
+    .map((cart) => ({
+      ...cart,
+      items: cart.items.filter((item) => item.shopId === shopId),
+    }))
+    .filter((cart) => cart.items.length > 0)
+    .map((cart) => ({
+      ...cart,
+      subtotal: cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    }));
 };
 
 const addItem = async (userId, productId, quantity) => {
@@ -100,6 +132,7 @@ const clearCart = async (userId) => {
 module.exports = {
   getOrCreateCart,
   getHydratedCart,
+  listAllCarts,
   addItem,
   updateItemQuantity,
   removeItem,

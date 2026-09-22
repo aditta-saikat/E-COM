@@ -6,6 +6,12 @@ const getCart = async (req, res) => {
   return res.status(200).json(result);
 };
 
+const listAllCarts = async (req, res) => {
+  const { shopId } = req.query;
+  const carts = await cartService.listAllCarts({ shopId });
+  return res.status(200).json({ items: carts });
+};
+
 const addItem = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -47,4 +53,4 @@ const clearCart = async (req, res) => {
   return res.status(204).send();
 };
 
-module.exports = { getCart, addItem, updateItem, removeItem, clearCart };
+module.exports = { getCart, listAllCarts, addItem, updateItem, removeItem, clearCart };
