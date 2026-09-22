@@ -38,7 +38,7 @@ const QUICK_LINKS_BY_ROLE = {
   ],
   admin: [
     { to: '/products', title: 'Browse products', description: 'Search and explore the full catalog.', icon: Package, accent: 'bg-indigo-500' },
-    { to: '/admin/shops', title: 'Pending shops', description: 'Review and approve shop requests.', icon: ShieldCheck, accent: 'bg-rose-500' },
+    { to: '/admin/shops', title: 'Manage shops', description: 'Review requests, browse every shop, and manage their products.', icon: ShieldCheck, accent: 'bg-rose-500' },
     { to: '/profile', title: 'Profile', description: 'View your account details.', icon: UserCircle, accent: 'bg-emerald-500' },
   ],
 }

@@ -12,6 +12,9 @@ jobs:
     outputs:
       auth: ${{ steps.filter.outputs.auth }}
       catalog: ${{ steps.filter.outputs.catalog }}
+      cart: ${{ steps.filter.outputs.cart }}
+      order: ${{ steps.filter.outputs.order }}
+      payment: ${{ steps.filter.outputs.payment }}
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
       - uses: actions/checkout@v4
@@ -26,6 +29,12 @@ jobs:
               - 'auth-service/**'
             catalog:
               - 'product-catalog-service/**'
+            cart:
+              - 'cart-service/**'
+            order:
+              - 'order-service/**'
+            payment:
+              - 'payment-service/**'
             frontend:
               - 'frontend/**'
 
@@ -80,6 +89,84 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/product-catalog-service:latest
             ghcr.io/${{ github.repository_owner }}/product-catalog-service:${{ github.sha }}
+
+  cart-build-and-push:
+    needs: changes
+    if: needs.changes.outputs.cart == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: cart-service
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/cart-service:latest
+            ghcr.io/${{ github.repository_owner }}/cart-service:${{ github.sha }}
+
+  order-build-and-push:
+    needs: changes
+    if: needs.changes.outputs.order == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: order-service
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/order-service:latest
+            ghcr.io/${{ github.repository_owner }}/order-service:${{ github.sha }}
+
+  payment-build-and-push:
+    needs: changes
+    if: needs.changes.outputs.payment == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: payment-service
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/payment-service:latest
+            ghcr.io/${{ github.repository_owner }}/payment-service:${{ github.sha }}
 
   frontend-build:
     needs: changes
