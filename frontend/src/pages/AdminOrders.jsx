@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ShieldCheck } from 'lucide-react'
 import { listAllOrders } from '../api/orders'
-import AdminTabs from '../components/AdminTabs'
 import AdminOrdersTable from '../components/AdminOrdersTable'
 
 const AdminOrders = () => {
@@ -18,10 +17,8 @@ const AdminOrders = () => {
     <div className="mx-auto max-w-5xl px-6 py-8">
       <div className="mb-6 flex items-center gap-2">
         <ShieldCheck size={22} className="text-rose-600 dark:text-rose-400" />
-        <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-100">Admin</h1>
+        <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-100">Orders</h1>
       </div>
-
-      <AdminTabs />
 
       {error && <p className="mb-6 text-sm text-rose-600 dark:text-rose-400">{error}</p>}
 
