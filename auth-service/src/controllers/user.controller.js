@@ -13,6 +13,16 @@ const updateCurrentUser = async (req, res, next) => {
       allowedUpdates.displayName = req.body.displayName.trim();
     }
 
+    if (typeof req.body.avatarUrl === 'string') {
+      const avatarUrl = req.body.avatarUrl.trim();
+
+      if (avatarUrl && !/^https:\/\//i.test(avatarUrl)) {
+        return res.status(400).json({ error: 'avatarUrl must be an https URL' });
+      }
+
+      allowedUpdates.avatarUrl = avatarUrl;
+    }
+
     const user = await updateUserProfile(req.user._id, allowedUpdates);
     res.status(200).json({ user });
   } catch (error) {
