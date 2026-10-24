@@ -29,7 +29,7 @@ const Products = () => {
   useEffect(() => {
     listProducts()
       .then((result) => {
-        const unique = [...new Set(result.items.map((item) => item.category))].sort()
+        const unique = [...new Set((result.items ?? []).map((item) => item.category))].sort()
         setCategories(unique)
       })
       .catch(() => {})
@@ -42,6 +42,10 @@ const Products = () => {
 
       try {
         const result = await listProducts({ search, category: category || undefined })
+        if (!Array.isArray(result?.items)) {
+          throw new Error('Unexpected response from product-catalog-service')
+        }
+
         setProducts(result.items)
       } catch (err) {
         setError('Could not load products. Is product-catalog-service running?')

@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    avatarUrl: {
+      type: String,
+      trim: true,
+      default: '',
+      maxlength: 2048,
+    },
     role: {
       type: String,
       enum: ['customer', 'shop_admin', 'admin'],

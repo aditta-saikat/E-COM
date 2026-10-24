@@ -6,6 +6,7 @@ const toSafeUser = (user) => ({
   _id: user._id,
   email: user.email,
   displayName: user.displayName,
+  avatarUrl: user.avatarUrl,
   role: user.role,
 });
 
