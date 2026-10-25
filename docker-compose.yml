@@ -1,0 +1,107 @@
+# Run the whole stack: docker compose up --build
+# Needs a root .env (copy .env.example) with JWT_SECRET and INTERNAL_API_KEY.
+# Services reach each other by service name; the browser reaches them on localhost via the published ports.
+
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+  depends_on:
+    mongo:
+      condition: service_healthy
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    <<: *service-defaults
+    build: ./auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/auth-service
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      JWT_EXPIRES_IN: 7d
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:?set INTERNAL_API_KEY in .env}
+
+  product-catalog-service:
+    <<: *service-defaults
+    build: ./product-catalog-service
+    ports:
+      - "3002:3002"
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      MONGODB_URI: mongodb://mongo:27017/product-catalog-service
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:?set INTERNAL_API_KEY in .env}
+      AUTH_SERVICE_URL: http://auth-service:3001
+
+  cart-service:
+    <<: *service-defaults
+    build: ./cart-service
+    ports:
+      - "3003:3003"
+    environment:
+      NODE_ENV: production
+      PORT: 3003
+      MONGODB_URI: mongodb://mongo:27017/cart-service
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      PRODUCT_CATALOG_URL: http://product-catalog-service:3002
+
+  order-service:
+    <<: *service-defaults
+    build: ./order-service
+    ports:
+      - "3004:3004"
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      MONGODB_URI: mongodb://mongo:27017/order-service
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:?set INTERNAL_API_KEY in .env}
+      CART_SERVICE_URL: http://cart-service:3003
+      PRODUCT_CATALOG_URL: http://product-catalog-service:3002
+      PAYMENT_SERVICE_URL: http://payment-service:3005
+
+  payment-service:
+    <<: *service-defaults
+    build: ./payment-service
+    ports:
+      - "3005:3005"
+    environment:
+      NODE_ENV: production
+      PORT: 3005
+      MONGODB_URI: mongodb://mongo:27017/payment-service
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:?set INTERNAL_API_KEY in .env}
+      PAYMENT_PROVIDER: mock
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_AUTH_SERVICE_URL: http://localhost:3001
+        VITE_PRODUCT_CATALOG_URL: http://localhost:3002
+        VITE_CART_SERVICE_URL: http://localhost:3003
+        VITE_ORDER_SERVICE_URL: http://localhost:3004
+        VITE_IMGBB_API_KEY: ${VITE_IMGBB_API_KEY:-}
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - auth-service
+      - product-catalog-service
+      - cart-service
+      - order-service
+
+volumes:
+  mongo-data:
