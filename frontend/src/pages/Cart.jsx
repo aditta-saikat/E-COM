@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Loader2, Minus, Package, Plus, ShoppingCart, Trash2 } from 'lucide-react'
+import { ArrowRight, Loader2, Minus, Package, Plus, ShoppingCart, Trash2 } from 'lucide-react'
 import { formatPrice } from '../lib/formatPrice'
+import EmptyState from '../components/EmptyState'
+import OrderSummary from '../components/OrderSummary'
+import PageHeader from '../components/PageHeader'
 import { useCart } from '../context/CartContext'
 
 const CartLineItem = ({ item, onUpdate, onRemove }) => {
@@ -27,19 +30,19 @@ const CartLineItem = ({ item, onUpdate, onRemove }) => {
   }
 
   return (
-    <div className="flex items-center gap-4 border-b border-slate-200 py-4 last:border-b-0 dark:border-slate-800">
-      <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-300 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-500">
+    <div className="flex flex-wrap items-center gap-4 border-b border-slate-100 py-5 first:pt-0 last:border-b-0 last:pb-0 dark:border-slate-800">
+      <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-300 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-500">
         {item.image ? (
           <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
         ) : (
-          <Package size={24} strokeWidth={1.5} />
+          <Package size={28} strokeWidth={1.5} />
         )}
       </div>
 
       <div className="min-w-0 flex-1">
         <Link
           to={`/products/${item.productId}`}
-          className="truncate font-medium text-slate-900 hover:text-indigo-600 dark:text-slate-100 dark:hover:text-indigo-400"
+          className="block truncate font-medium text-slate-900 hover:text-indigo-600 dark:text-slate-100 dark:hover:text-indigo-400"
         >
           {item.name}
         </Link>
@@ -48,7 +51,7 @@ const CartLineItem = ({ item, onUpdate, onRemove }) => {
         </p>
       </div>
 
-      <div className="flex items-center rounded-lg border border-slate-300 dark:border-slate-700">
+      <div className="flex items-center rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/50">
         <button
           type="button"
           disabled={busy}
@@ -93,48 +96,42 @@ const Cart = () => {
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto flex max-w-2xl flex-col items-center px-6 py-20 text-center">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-400">
-          <ShoppingCart size={24} />
-        </div>
-        <h1 className="font-display text-xl font-bold text-slate-900 dark:text-slate-100">Your cart is empty</h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Browse products and add something you like.
-        </p>
-        <Link
-          to="/products"
-          className="mt-6 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500"
-        >
-          Browse products
-        </Link>
-      </div>
+      <EmptyState
+        icon={ShoppingCart}
+        title="Your cart is empty"
+        description="Browse products and add something you like."
+        action={{ to: '/products', label: 'Browse products' }}
+      />
     )
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-8">
-      <h1 className="font-display mb-6 text-2xl font-bold text-slate-900 dark:text-slate-100">Your cart</h1>
+    <div className="mx-auto max-w-6xl px-6 py-8">
+      <PageHeader icon={ShoppingCart} title="Your cart" subtitle="Review your items before checking out." />
 
-      <div className="rounded-2xl border border-slate-200 bg-white px-5 dark:border-slate-800 dark:bg-slate-900">
-        {items.map((item) => (
-          <CartLineItem key={item.productId} item={item} onUpdate={updateItem} onRemove={removeItem} />
-        ))}
-      </div>
-
-      <div className="mt-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-        <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Subtotal</p>
-          <p className="text-xl font-bold text-slate-900 dark:text-slate-100">
-            {formatPrice(cart.subtotal, items[0]?.currency)}
-          </p>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2 dark:border-slate-800 dark:bg-slate-900">
+          {items.map((item) => (
+            <CartLineItem key={item.productId} item={item} onUpdate={updateItem} onRemove={removeItem} />
+          ))}
         </div>
-        <button
-          type="button"
-          onClick={() => navigate('/checkout')}
-          className="rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500"
-        >
-          Checkout
-        </button>
+
+        <OrderSummary items={items} subtotal={cart.subtotal}>
+          <button
+            type="button"
+            onClick={() => navigate('/checkout')}
+            className="group flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-500 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 dark:bg-indigo-500/90 dark:hover:bg-indigo-500"
+          >
+            Proceed to checkout
+            <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
+          </button>
+          <Link
+            to="/products"
+            className="mt-3 block text-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+          >
+            Continue shopping
+          </Link>
+        </OrderSummary>
       </div>
     </div>
   )

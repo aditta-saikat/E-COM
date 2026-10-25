@@ -43,21 +43,54 @@ product-catalog-service ──► auth-service   (sets role to shop_admin when a
 
 Prices are stored as integer **minor units** (e.g. paisa) everywhere.
 
+## Becoming a seller (shop flow)
+
+1. A **customer** opens **Open a shop** in the navbar (`/my-shop`) and submits a name and description. The shop is created as `pending` (one shop per user).
+2. An **admin** opens **Admin** (`/admin/shops`), sees it under *Pending requests*, and approves or rejects it (with a reason).
+3. On approval, product-catalog-service marks the shop `approved` and calls auth-service to change the owner's role to `shop_admin`.
+4. The owner must **log in again**: the role lives inside the JWT, so the old token still says `customer`. The My shop page shows a banner with a "Log out now" button when this applies.
+5. The owner now sees **My shop** and **My products** and can create products. A rejected shop shows the reason on My shop.
+
 ## Running locally
 
 Requirements: Node 20+, a MongoDB instance (local or Atlas).
 
-1. Copy each service's `.env.example` to `.env` and fill it in. See [Environment](#environment) for what must match across services.
-2. Install and start each backend, then the frontend:
+### Option 1: one command (recommended for development)
+
+1. Copy each service's `.env.example` to `.env` and fill it in (see [Environment](#environment)). Also `cp frontend/.env.example frontend/.env`.
+2. From the repo root:
    ```bash
-   cd auth-service && npm install && npm run dev            # 3001
-   cd product-catalog-service && npm install && npm run dev # 3002
-   cd cart-service && npm install && npm run dev            # 3003
-   cd order-service && npm install && npm run dev           # 3004
-   cd payment-service && npm install && npm run dev         # 3005
-   cd frontend && cp .env.example .env && npm install && npm run dev  # 5173
+   npm run install:all   # once: installs the root tool and every service
+   npm run dev           # starts auth, catalog, cart, order, payment and the frontend
    ```
+   Logs are prefixed and colour-coded per service. Ctrl+C stops everything. `npm run dev:backend` starts only the five backends.
 3. Open http://localhost:5173.
+
+### Option 2: Docker Compose
+
+Runs all services, the frontend (served by nginx) and a local MongoDB with separate databases per service.
+
+```bash
+cp .env.example .env      # set JWT_SECRET and INTERNAL_API_KEY (and optionally VITE_IMGBB_API_KEY)
+docker compose up --build # or: npm run docker:up
+```
+
+- The frontend is on http://localhost:5173 and the services on ports 3001 to 3005. Services call each other by name (e.g. `http://auth-service:3001`).
+- Docker does **not** read the per-service `.env` files. Configuration comes from `docker-compose.yml` and the root `.env`.
+- Services run with `NODE_ENV=production` (the dev-only `pino-pretty` logger is not installed in the images).
+- The frontend's `VITE_*` URLs are baked in at build time, so rebuild (`docker compose up --build`) after changing them.
+- Data lives in the `mongo-data` volume. `docker compose down -v` deletes it.
+
+### Manual (one terminal per service)
+
+```bash
+cd auth-service && npm install && npm run dev            # 3001
+cd product-catalog-service && npm install && npm run dev # 3002
+cd cart-service && npm install && npm run dev            # 3003
+cd order-service && npm install && npm run dev           # 3004
+cd payment-service && npm install && npm run dev         # 3005
+cd frontend && npm install && npm run dev                # 5173
+```
 
 `dotenv` only reads `.env` at startup, so **restart a service after changing its `.env`**. The same applies to the frontend's `.env` and Vite.
 
@@ -68,6 +101,8 @@ Requirements: Node 20+, a MongoDB instance (local or Atlas).
 | `JWT_SECRET` | auth, product-catalog, cart, order | Long random string |
 | `INTERNAL_API_KEY` | auth, product-catalog, order, payment | Long random string |
 | `MONGODB_URI` | one value per service | One clean line. Prefer a separate database name per service |
+
+For Docker, the shared values go in the root `.env` (see `.env.example`).
 
 Never commit a real `.env`. Only `.env.example` files with placeholder values belong in git.
 

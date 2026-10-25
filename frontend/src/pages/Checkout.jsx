@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Loader2, ShieldCheck } from 'lucide-react'
-import { formatPrice } from '../lib/formatPrice'
+import { Link, useNavigate } from 'react-router-dom'
+import { ChevronLeft, CreditCard, Loader2, MapPin, Phone, ShieldCheck, ShoppingCart, User } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { createOrder } from '../api/orders'
-
-const inputClass =
-  'w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder-slate-500'
+import EmptyState from '../components/EmptyState'
+import FormField from '../components/FormField'
+import OrderSummary from '../components/OrderSummary'
+import PageHeader from '../components/PageHeader'
 
 const Checkout = () => {
   const { cart, refresh } = useCart()
@@ -21,9 +21,12 @@ const Checkout = () => {
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto max-w-md px-6 py-20 text-center">
-        <p className="text-sm text-slate-500 dark:text-slate-400">Your cart is empty.</p>
-      </div>
+      <EmptyState
+        icon={ShoppingCart}
+        title="Your cart is empty"
+        description="Add something to your cart before checking out."
+        action={{ to: '/products', label: 'Browse products' }}
+      />
     )
   }
 
@@ -33,7 +36,7 @@ const Checkout = () => {
     setSubmitting(true)
 
     try {
-      const order = await createOrder({ fullName, phone, address })
+      const order = await createOrder({ fullName: fullName.trim(), phone: phone.trim(), address: address.trim() })
       await refresh()
       navigate(`/orders/${order._id}`)
     } catch (err) {
@@ -44,73 +47,78 @@ const Checkout = () => {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-8">
-      <h1 className="font-display mb-6 text-2xl font-bold text-slate-900 dark:text-slate-100">Checkout</h1>
+    <div className="mx-auto max-w-6xl px-6 py-8">
+      <Link
+        to="/cart"
+        className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+      >
+        <ChevronLeft size={15} />
+        Back to cart
+      </Link>
 
-      <div className="grid gap-6 sm:grid-cols-5">
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:col-span-3 dark:border-slate-800 dark:bg-slate-900"
-        >
-          <h2 className="font-medium text-slate-900 dark:text-slate-100">Shipping details</h2>
+      <PageHeader icon={CreditCard} title="Checkout" subtitle="Tell us where to send your order." />
 
-          <input
-            required
-            placeholder="Full name"
-            value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
-            className={inputClass}
-          />
-          <input
-            required
-            placeholder="Phone number"
-            value={phone}
-            onChange={(event) => setPhone(event.target.value)}
-            className={inputClass}
-          />
-          <textarea
-            required
-            placeholder="Shipping address"
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-            rows={3}
-            className={inputClass}
-          />
+      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-3">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 lg:col-span-2 dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="font-display text-lg font-bold text-slate-900 dark:text-slate-100">Shipping details</h2>
+          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">We will use these details to deliver your order.</p>
 
-          {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
+          <div className="mt-6 grid gap-5 sm:grid-cols-2">
+            <FormField
+              label="Full name"
+              icon={User}
+              required
+              autoComplete="name"
+              placeholder="Your full name"
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+            />
+            <FormField
+              label="Phone number"
+              icon={Phone}
+              type="tel"
+              required
+              autoComplete="tel"
+              placeholder="01XXXXXXXXX"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+            />
+            <div className="sm:col-span-2">
+              <FormField
+                label="Shipping address"
+                icon={MapPin}
+                multiline
+                rows={3}
+                required
+                autoComplete="street-address"
+                placeholder="House, road, area, city"
+                value={address}
+                onChange={(event) => setAddress(event.target.value)}
+              />
+            </div>
+          </div>
 
+          {error && (
+            <p role="alert" className="mt-5 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+              {error}
+            </p>
+          )}
+        </div>
+
+        <OrderSummary items={items} subtotal={cart.subtotal}>
           <button
             type="submit"
             disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-500 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-indigo-500/90 dark:hover:bg-indigo-500"
           >
             {submitting ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-            {submitting ? 'Placing order...' : 'Place order'}
+            {submitting ? 'Placing order…' : 'Place order'}
           </button>
-        </form>
-
-        <div className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:col-span-2 dark:border-slate-800 dark:bg-slate-900">
-          <h2 className="mb-4 font-medium text-slate-900 dark:text-slate-100">Order summary</h2>
-          <div className="space-y-3">
-            {items.map((item) => (
-              <div key={item.productId} className="flex justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">
-                  {item.name} × {item.quantity}
-                </span>
-                <span className="font-medium text-slate-900 dark:text-slate-100">
-                  {formatPrice(item.price * item.quantity, item.currency)}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex justify-between border-t border-slate-200 pt-4 dark:border-slate-800">
-            <span className="font-medium text-slate-900 dark:text-slate-100">Total</span>
-            <span className="font-bold text-slate-900 dark:text-slate-100">
-              {formatPrice(cart.subtotal, items[0]?.currency)}
-            </span>
-          </div>
-        </div>
-      </div>
+          <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
+            Payment is processed securely when you place the order.
+          </p>
+        </OrderSummary>
+      </form>
     </div>
   )
 }

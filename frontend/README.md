@@ -43,8 +43,8 @@ Admin: `/admin/shops`, `/admin/shops/:shopId`, `/admin/orders`, `/admin/carts`.
 
 ## Shared UI
 
-- **AuthShell**: the split card layout (soft gradient brand panel + form) used by Login and Signup. It sits in the same `max-w-6xl` column as the navbar and footer.
-- **FormField**: labelled input with an optional icon, hint and a show/hide toggle for passwords.
+- **AuthShell**: the split card layout (soft gradient brand panel + form) used by Login, Signup and the Open a shop form. The left panel's bullet list is configurable with `highlights`. It sits in the same `max-w-6xl` column as the navbar and footer.
+- **FormField**: labelled input with an optional icon, hint, `multiline` (textarea) mode and a show/hide toggle for passwords.
 - **ImageUploader**: controlled image picker (see below).
 
 - **AdminShopModal**: shop pop-up on `/admin/shops`. Clicking a shop (table row, grid card or pending request) opens it. It shows the shop summary (status, description, owner ID, dates, rejection reason) and three tabs with full tables: **Products** (all pages loaded, searchable), **Orders** and **Carts** (loaded when the tab is first opened). Pending shops can be approved or rejected from it. "Open full page to edit products" goes to `/admin/shops/:shopId`, where products can be created, edited and deleted.
