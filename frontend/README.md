@@ -48,7 +48,7 @@ Admin: `/admin/shops`, `/admin/shops/:shopId`, `/admin/orders`, `/admin/carts`.
 - **ImageUploader**: controlled image picker (see below).
 
 - **AdminShopModal**: shop pop-up on `/admin/shops`. Clicking a shop (table row, grid card or pending request) opens it. It shows the shop summary (status, description, owner ID, dates, rejection reason) and three tabs with full tables: **Products** (all pages loaded, searchable), **Orders** and **Carts** (loaded when the tab is first opened). Pending shops can be approved or rejected from it. "Open full page to edit products" goes to `/admin/shops/:shopId`, where products can be created, edited and deleted.
-- **AdminOrderModal**: opens when an order row is clicked (on `/admin/orders` and in the shop modal's Orders tab). Shows status, placed/updated time, customer, phone, shipping address, payment ID, every item and the total, with a link to the full order page.
+- **OrderModal**: opens when an order row is clicked: on `/orders` (customers, via `OrdersTable` with `showCustomer={false}`), on `/admin/orders` and in the shop modal's Orders tab. Shows status, placed/updated time, customer, phone, shipping address, payment ID, every item and the total, with a link to the full order page.
 - **AdminCartModal**: opens when a cart row is clicked (on `/admin/carts` and in the shop modal's Carts tab). Shows the customer ID, last update, every product (image, quantity, unit price, stock) and the subtotal.
 - **Modal** renders through a portal on `document.body`, so a modal can open on top of another one. Only the topmost modal closes on Escape.
 

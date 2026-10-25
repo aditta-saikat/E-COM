@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { ChevronDown, ChevronRight, ReceiptText, Search } from 'lucide-react'
-import AdminOrderModal from './AdminOrderModal'
+import OrderModal from './OrderModal'
 import { formatPrice } from '../lib/formatPrice'
 
 const STATUS_META = {
@@ -14,7 +14,7 @@ const STATUS_META = {
 const formatDate = (isoDate) =>
   new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(isoDate))
 
-const AdminOrdersTable = ({ orders, emptyMessage = 'No orders yet.' }) => {
+const OrdersTable = ({ orders, emptyMessage = 'No orders yet.', showCustomer = true }) => {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -87,7 +87,7 @@ const AdminOrdersTable = ({ orders, emptyMessage = 'No orders yet.' }) => {
             <thead>
               <tr className="border-b border-slate-200 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:border-slate-800 dark:text-slate-400">
                 <th className="px-6 py-3.5">Order</th>
-                <th className="px-6 py-3.5">Customer</th>
+                {showCustomer && <th className="px-6 py-3.5">Customer</th>}
                 <th className="px-6 py-3.5">Items</th>
                 <th className="px-6 py-3.5">Total</th>
                 <th className="px-6 py-3.5">Status</th>
@@ -109,9 +109,11 @@ const AdminOrdersTable = ({ orders, emptyMessage = 'No orders yet.' }) => {
                     <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">
                       #{order._id.slice(-8).toUpperCase()}
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs text-slate-500 dark:text-slate-400" title={order.userId}>
-                      {order.shippingAddress?.fullName || order.userId.slice(-8)}
-                    </td>
+                    {showCustomer && (
+                      <td className="px-6 py-4 font-mono text-xs text-slate-500 dark:text-slate-400" title={order.userId}>
+                        {order.shippingAddress?.fullName || order.userId.slice(-8)}
+                      </td>
+                    )}
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{order.items.length}</td>
                     <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">
                       {formatPrice(order.total, order.currency)}
@@ -133,9 +135,9 @@ const AdminOrdersTable = ({ orders, emptyMessage = 'No orders yet.' }) => {
         </div>
       )}
 
-      <AdminOrderModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+      <OrderModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
     </div>
   )
 }
 
-export default AdminOrdersTable
+export default OrdersTable

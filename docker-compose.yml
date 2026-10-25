@@ -83,7 +83,9 @@ services:
       PORT: 3005
       MONGODB_URI: mongodb://mongo:27017/payment-service
       INTERNAL_API_KEY: ${INTERNAL_API_KEY:?set INTERNAL_API_KEY in .env}
-      PAYMENT_PROVIDER: mock
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-mock}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_TEST_PAYMENT_METHOD: ${STRIPE_TEST_PAYMENT_METHOD:-}
 
   frontend:
     build:

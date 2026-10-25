@@ -16,7 +16,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import Modal from './Modal'
-import AdminOrdersTable from './AdminOrdersTable'
+import OrdersTable from './OrdersTable'
 import AdminCartsTable from './AdminCartsTable'
 import { listProducts } from '../api/products'
 import { listAllOrders } from '../api/orders'
@@ -276,7 +276,7 @@ const AdminShopModal = ({ shop, onClose, onApprove, onReject }) => {
           )}
           {tab === 'orders' && (
             <TabState loading={orders === null} failed={failed.orders}>
-              <AdminOrdersTable orders={orders || []} emptyMessage="This shop has no orders yet." />
+              <OrdersTable orders={orders || []} emptyMessage="This shop has no orders yet." />
             </TabState>
           )}
           {tab === 'carts' && (

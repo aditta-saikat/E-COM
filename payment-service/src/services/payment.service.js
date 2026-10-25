@@ -1,12 +1,13 @@
 const Payment = require('../models/payment.model');
 const mockProvider = require('../providers/mock.provider');
+const stripeProvider = require('../providers/stripe.provider');
 const logger = require('../config/logger');
 
-const providers = { mock: mockProvider };
+const providers = { mock: mockProvider, stripe: stripeProvider };
 
 const charge = async ({ orderId, userId, amount, currency }) => {
   const provider = providers[process.env.PAYMENT_PROVIDER || 'mock'];
-  const result = await provider.charge({ amount, currency });
+  const result = await provider.charge({ orderId, amount, currency });
 
   const payment = await Payment.create({
     orderId,

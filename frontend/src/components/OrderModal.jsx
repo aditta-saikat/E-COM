@@ -23,7 +23,7 @@ const Info = ({ icon: Icon, label, children }) => (
   </div>
 )
 
-const AdminOrderModal = ({ order, onClose }) => {
+const OrderModal = ({ order, onClose }) => {
   const meta = order ? STATUS_META[order.status] || STATUS_META.pending_payment : null
 
   return (
@@ -97,4 +97,4 @@ const AdminOrderModal = ({ order, onClose }) => {
   )
 }
 
-export default AdminOrderModal
+export default OrderModal

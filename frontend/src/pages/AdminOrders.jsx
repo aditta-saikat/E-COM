@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ReceiptText } from 'lucide-react'
 import { listAllOrders } from '../api/orders'
 import PageHeader from '../components/PageHeader'
-import AdminOrdersTable from '../components/AdminOrdersTable'
+import OrdersTable from '../components/OrdersTable'
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState(null)
@@ -22,7 +22,7 @@ const AdminOrders = () => {
 
       {orders === null && !error && <p className="text-sm text-slate-500 dark:text-slate-400">Loading...</p>}
 
-      {orders !== null && <AdminOrdersTable orders={orders} emptyMessage="No orders have been placed yet." />}
+      {orders !== null && <OrdersTable orders={orders} emptyMessage="No orders have been placed yet." />}
     </div>
   )
 }

@@ -17,7 +17,7 @@ import { listShops } from '../api/shops'
 import { listAllOrders } from '../api/orders'
 import { listAllCarts } from '../api/cart'
 import ProductsManager from '../components/ProductsManager'
-import AdminOrdersTable from '../components/AdminOrdersTable'
+import OrdersTable from '../components/OrdersTable'
 import AdminCartsTable from '../components/AdminCartsTable'
 
 const STATUS_META = {
@@ -191,7 +191,7 @@ const AdminShopDetail = () => {
         (orders === null ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">Loading...</p>
         ) : (
-          <AdminOrdersTable orders={orders} emptyMessage="This shop has no orders yet." />
+          <OrdersTable orders={orders} emptyMessage="This shop has no orders yet." />
         ))}
 
       {tab === 'cart' &&
