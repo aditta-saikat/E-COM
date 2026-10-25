@@ -35,7 +35,7 @@ const App = () => {
 
       <Navbar />
 
-      <main className="flex flex-1 flex-col">
+      <main className="flex flex-1 flex-col *:w-full">
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/" element={<Home />} />

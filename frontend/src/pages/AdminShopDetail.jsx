@@ -91,7 +91,7 @@ const AdminShopDetail = () => {
   const StatusIcon = statusMeta?.icon
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8">
+    <div className="mx-auto max-w-6xl px-6 py-8">
       <Link
         to="/admin/shops"
         className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"

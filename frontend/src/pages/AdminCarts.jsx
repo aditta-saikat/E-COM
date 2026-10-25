@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { ShieldCheck } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
 import { listAllCarts } from '../api/cart'
+import PageHeader from '../components/PageHeader'
 import AdminCartsTable from '../components/AdminCartsTable'
 
 const AdminCarts = () => {
@@ -14,11 +15,8 @@ const AdminCarts = () => {
   }, [])
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-8">
-      <div className="mb-6 flex items-center gap-2">
-        <ShieldCheck size={22} className="text-rose-600 dark:text-rose-400" />
-        <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-100">Carts</h1>
-      </div>
+    <div className="mx-auto max-w-6xl px-6 py-8">
+      <PageHeader icon={ShoppingCart} title="Carts" subtitle="Active carts customers are building right now." />
 
       {error && <p className="mb-6 text-sm text-rose-600 dark:text-rose-400">{error}</p>}
 

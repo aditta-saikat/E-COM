@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ChevronDown, ChevronRight, ClipboardList, Search } from 'lucide-react'
+import { ChevronDown, ChevronRight, ReceiptText, Search } from 'lucide-react'
+import AdminOrderModal from './AdminOrderModal'
 import { formatPrice } from '../lib/formatPrice'
 
 const STATUS_META = {
@@ -15,7 +15,7 @@ const formatDate = (isoDate) =>
   new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(isoDate))
 
 const AdminOrdersTable = ({ orders, emptyMessage = 'No orders yet.' }) => {
-  const navigate = useNavigate()
+  const [selectedOrder, setSelectedOrder] = useState(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
 
@@ -71,9 +71,11 @@ const AdminOrdersTable = ({ orders, emptyMessage = 'No orders yet.' }) => {
       </div>
 
       {filteredOrders.length === 0 && (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 py-16 text-center dark:border-slate-700">
-          <ClipboardList size={32} className="text-slate-300 dark:text-slate-700" />
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center dark:border-slate-700 dark:bg-slate-900/50">
+          <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-100 to-cyan-100 text-indigo-500 dark:from-indigo-500/15 dark:to-cyan-500/15 dark:text-indigo-300">
+            <ReceiptText size={28} />
+          </span>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
             {orders.length === 0 ? emptyMessage : 'No orders match your filters.'}
           </p>
         </div>
@@ -81,16 +83,16 @@ const AdminOrdersTable = ({ orders, emptyMessage = 'No orders yet.' }) => {
 
       {filteredOrders.length > 0 && (
         <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-[0.9375rem]">
             <thead>
               <tr className="border-b border-slate-200 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:border-slate-800 dark:text-slate-400">
-                <th className="px-5 py-3">Order</th>
-                <th className="px-5 py-3">Customer</th>
-                <th className="px-5 py-3">Items</th>
-                <th className="px-5 py-3">Total</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3">Placed</th>
-                <th className="px-5 py-3" />
+                <th className="px-6 py-3.5">Order</th>
+                <th className="px-6 py-3.5">Customer</th>
+                <th className="px-6 py-3.5">Items</th>
+                <th className="px-6 py-3.5">Total</th>
+                <th className="px-6 py-3.5">Status</th>
+                <th className="px-6 py-3.5">Placed</th>
+                <th className="px-6 py-3.5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -99,28 +101,28 @@ const AdminOrdersTable = ({ orders, emptyMessage = 'No orders yet.' }) => {
                 return (
                   <tr
                     key={order._id}
-                    onClick={() => navigate(`/orders/${order._id}`)}
+                    onClick={() => setSelectedOrder(order)}
                     tabIndex={0}
-                    onKeyDown={(event) => event.key === 'Enter' && navigate(`/orders/${order._id}`)}
+                    onKeyDown={(event) => event.key === 'Enter' && setSelectedOrder(order)}
                     className="cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-800/60"
                   >
-                    <td className="px-5 py-3 font-medium text-slate-900 dark:text-slate-100">
+                    <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">
                       #{order._id.slice(-8).toUpperCase()}
                     </td>
-                    <td className="px-5 py-3 font-mono text-xs text-slate-500 dark:text-slate-400" title={order.userId}>
+                    <td className="px-6 py-4 font-mono text-xs text-slate-500 dark:text-slate-400" title={order.userId}>
                       {order.shippingAddress?.fullName || order.userId.slice(-8)}
                     </td>
-                    <td className="px-5 py-3 text-slate-600 dark:text-slate-400">{order.items.length}</td>
-                    <td className="px-5 py-3 font-medium text-slate-900 dark:text-slate-100">
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{order.items.length}</td>
+                    <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">
                       {formatPrice(order.total, order.currency)}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className="px-6 py-4">
                       <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${meta.className}`}>
                         {meta.label}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-slate-500 dark:text-slate-400">{formatDate(order.createdAt)}</td>
-                    <td className="px-5 py-3">
+                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400">{formatDate(order.createdAt)}</td>
+                    <td className="px-6 py-4">
                       <ChevronRight size={16} className="text-slate-300 dark:text-slate-700" />
                     </td>
                   </tr>
@@ -130,6 +132,8 @@ const AdminOrdersTable = ({ orders, emptyMessage = 'No orders yet.' }) => {
           </table>
         </div>
       )}
+
+      <AdminOrderModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
     </div>
   )
 }
