@@ -1,0 +1,16 @@
+{
+  "name": "e-com",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Run the whole E-COM stack from one place",
+  "scripts": {
+    "install:all": "npm install && npm --prefix auth-service install && npm --prefix product-catalog-service install && npm --prefix cart-service install && npm --prefix order-service install && npm --prefix payment-service install && npm --prefix frontend install",
+    "dev": "concurrently -k -n auth,catalog,cart,order,pay,web -c blue,green,yellow,magenta,cyan,white \"npm --prefix auth-service run dev\" \"npm --prefix product-catalog-service run dev\" \"npm --prefix cart-service run dev\" \"npm --prefix order-service run dev\" \"npm --prefix payment-service run dev\" \"npm --prefix frontend run dev\"",
+    "dev:backend": "concurrently -k -n auth,catalog,cart,order,pay -c blue,green,yellow,magenta,cyan \"npm --prefix auth-service run dev\" \"npm --prefix product-catalog-service run dev\" \"npm --prefix cart-service run dev\" \"npm --prefix order-service run dev\" \"npm --prefix payment-service run dev\"",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

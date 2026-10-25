@@ -66,12 +66,18 @@ const checkout = async (userId, bearerToken, shippingAddress) => {
     decremented.push({ productId: item.productId, quantity: item.quantity });
   }
 
-  const payment = await paymentClient.charge({
-    orderId: order._id.toString(),
-    userId,
-    amount: total,
-    currency,
-  });
+  let payment = null;
+
+  try {
+    payment = await paymentClient.charge({
+      orderId: order._id.toString(),
+      userId,
+      amount: total,
+      currency,
+    });
+  } catch (error) {
+    logger.error({ err: error, orderId: order._id }, 'Payment request errored - outcome unknown, check the payment provider');
+  }
 
   if (!payment || payment.status !== 'succeeded') {
     await rollbackStock(decremented);

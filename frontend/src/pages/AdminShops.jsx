@@ -17,7 +17,8 @@ import {
 } from 'lucide-react'
 import { approveShop, listPendingShops, listShops, rejectShop } from '../api/shops'
 import { useAuth } from '../context/AuthContext'
-import AdminTabs from '../components/AdminTabs'
+import PageHeader from '../components/PageHeader'
+import AdminShopModal from '../components/AdminShopModal'
 
 const STATUS_META = {
   pending: { label: 'Pending', icon: Clock, className: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300' },
@@ -45,6 +46,7 @@ const AdminShops = () => {
   const [allShops, setAllShops] = useState([])
   const [error, setError] = useState('')
   const [stalePermissions, setStalePermissions] = useState(false)
+  const [selectedShop, setSelectedShop] = useState(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [view, setView] = useState(() => localStorage.getItem('admin_shops_view') || 'table')
@@ -113,13 +115,8 @@ const AdminShops = () => {
   )
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-8">
-      <div className="mb-6 flex items-center gap-2">
-        <ShieldCheck size={22} className="text-rose-600 dark:text-rose-400" />
-        <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-100">Admin</h1>
-      </div>
-
-      <AdminTabs />
+    <div className="mx-auto max-w-6xl px-6 py-8">
+      <PageHeader icon={ShieldCheck} title="Admin" subtitle="Review shops, orders and carts across the marketplace." />
 
       {error && stalePermissions && (
         <div className="mb-6 flex flex-col items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
@@ -152,10 +149,10 @@ const AdminShops = () => {
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-500 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-400">
                   <Store size={18} />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-slate-900 dark:text-slate-100">{shop.name}</p>
+                <button type="button" onClick={() => setSelectedShop(shop)} className="min-w-0 flex-1 text-left">
+                  <p className="truncate font-medium text-slate-900 hover:text-indigo-600 dark:text-slate-100 dark:hover:text-indigo-400">{shop.name}</p>
                   <p className="truncate text-sm text-slate-500 dark:text-slate-400">{shop.description || 'No description'}</p>
-                </div>
+                </button>
                 <div className="flex shrink-0 gap-2">
                   <button
                     type="button"
@@ -249,14 +246,14 @@ const AdminShops = () => {
 
       {filteredShops.length > 0 && view === 'table' && (
         <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-[0.9375rem]">
             <thead>
               <tr className="border-b border-slate-200 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:border-slate-800 dark:text-slate-400">
-                <th className="px-5 py-3">Shop</th>
-                <th className="px-5 py-3">Description</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3">Created</th>
-                <th className="px-5 py-3" />
+                <th className="px-6 py-3.5">Shop</th>
+                <th className="px-6 py-3.5">Description</th>
+                <th className="px-6 py-3.5">Status</th>
+                <th className="px-6 py-3.5">Created</th>
+                <th className="px-6 py-3.5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -267,12 +264,12 @@ const AdminShops = () => {
                 return (
                   <tr
                     key={shop._id}
-                    onClick={() => navigate(`/admin/shops/${shop._id}`)}
+                    onClick={() => setSelectedShop(shop)}
                     tabIndex={0}
-                    onKeyDown={(event) => event.key === 'Enter' && navigate(`/admin/shops/${shop._id}`)}
+                    onKeyDown={(event) => event.key === 'Enter' && setSelectedShop(shop)}
                     className="cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-800/60"
                   >
-                    <td className="px-5 py-3">
+                    <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-500 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-400">
                           <Store size={15} />
@@ -280,10 +277,10 @@ const AdminShops = () => {
                         <span className="font-medium text-slate-900 dark:text-slate-100">{shop.name}</span>
                       </div>
                     </td>
-                    <td className="max-w-xs truncate px-5 py-3 text-slate-500 dark:text-slate-400">
+                    <td className="max-w-xs truncate px-6 py-4 text-slate-500 dark:text-slate-400">
                       {shop.description || 'No description'}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${statusMeta.className}`}
                       >
@@ -291,8 +288,8 @@ const AdminShops = () => {
                         {statusMeta.label}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-slate-500 dark:text-slate-400">{formatDate(shop.createdAt)}</td>
-                    <td className="px-5 py-3">
+                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400">{formatDate(shop.createdAt)}</td>
+                    <td className="px-6 py-4">
                       <ChevronRight size={16} className="text-slate-300 dark:text-slate-700" />
                     </td>
                   </tr>
@@ -313,7 +310,7 @@ const AdminShops = () => {
               <button
                 key={shop._id}
                 type="button"
-                onClick={() => navigate(`/admin/shops/${shop._id}`)}
+                onClick={() => setSelectedShop(shop)}
                 className="group flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
               >
                 <div className="mb-3 flex w-full items-start justify-between">
@@ -339,6 +336,13 @@ const AdminShops = () => {
           })}
         </div>
       )}
+
+      <AdminShopModal
+        shop={selectedShop}
+        onClose={() => setSelectedShop(null)}
+        onApprove={handleApprove}
+        onReject={handleReject}
+      />
     </div>
   )
 }

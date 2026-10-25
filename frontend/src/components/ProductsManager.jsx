@@ -174,20 +174,20 @@ const ProductsManager = ({ products, onCreate, onUpdate, onDelete, emptyMessage 
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-[0.9375rem]">
             <thead>
               <tr className="border-b border-slate-200 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:border-slate-800 dark:text-slate-400">
-                <th className="px-5 py-3">Product</th>
-                <th className="px-5 py-3">Category</th>
-                <th className="px-5 py-3">Price</th>
-                <th className="px-5 py-3">Stock</th>
-                <th className="px-5 py-3" />
+                <th className="px-6 py-3.5">Product</th>
+                <th className="px-6 py-3.5">Category</th>
+                <th className="px-6 py-3.5">Price</th>
+                <th className="px-6 py-3.5">Stock</th>
+                <th className="px-6 py-3.5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filtered.map((product) => (
                 <tr key={product._id} className="transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
-                  <td className="px-5 py-3">
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {product.images?.[0] ? (
                         <img src={product.images[0]} alt="" className="h-9 w-9 shrink-0 rounded-lg object-cover" />
@@ -202,9 +202,9 @@ const ProductsManager = ({ products, onCreate, onUpdate, onDelete, emptyMessage 
                       </div>
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-slate-500 capitalize dark:text-slate-400">{product.category || '—'}</td>
-                  <td className="px-5 py-3 text-slate-700 dark:text-slate-300">{formatPrice(product.price, product.currency)}</td>
-                  <td className="px-5 py-3">
+                  <td className="px-6 py-4 text-slate-500 capitalize dark:text-slate-400">{product.category || '—'}</td>
+                  <td className="px-6 py-4 text-slate-700 dark:text-slate-300">{formatPrice(product.price, product.currency)}</td>
+                  <td className="px-6 py-4">
                     <span
                       className={
                         product.stock === 0
@@ -217,7 +217,7 @@ const ProductsManager = ({ products, onCreate, onUpdate, onDelete, emptyMessage 
                       {product.stock}
                     </span>
                   </td>
-                  <td className="px-5 py-3">
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-1">
                       <button
                         type="button"

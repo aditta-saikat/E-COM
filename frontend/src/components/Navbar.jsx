@@ -43,6 +43,13 @@ const Navbar = () => {
         </NavLink>
 
         <div className="flex items-center gap-1">
+          {currentUser && (
+            <NavLink to="/" end className={linkClass}>
+              <LayoutDashboard size={16} />
+              <span className="hidden sm:inline">Dashboard</span>
+            </NavLink>
+          )}
+
           <NavLink to="/products" className={linkClass}>
             <Package size={16} />
             <span className="hidden sm:inline">Products</span>
@@ -50,11 +57,6 @@ const Navbar = () => {
 
           {currentUser ? (
             <>
-              <NavLink to="/" end className={linkClass}>
-                <LayoutDashboard size={16} />
-                <span className="hidden sm:inline">Dashboard</span>
-              </NavLink>
-
               {currentUser.role === 'admin' && (
                 <NavLink to="/admin/shops" className={linkClass}>
                   <Shield size={16} />
@@ -62,12 +64,17 @@ const Navbar = () => {
                 </NavLink>
               )}
 
-              {(currentUser.role === 'customer' || currentUser.role === 'shop_admin') && (
+              {currentUser.role === 'customer' && (
                 <NavLink to="/my-shop" className={linkClass}>
                   <Store size={16} />
-                  <span className="hidden sm:inline">
-                    {currentUser.role === 'shop_admin' ? 'My shop' : 'Open a shop'}
-                  </span>
+                  <span className="hidden sm:inline">Open a shop</span>
+                </NavLink>
+              )}
+
+              {currentUser.role === 'shop_admin' && (
+                <NavLink to="/my-shop" className={linkClass}>
+                  <Store size={16} />
+                  <span className="hidden sm:inline">My shop</span>
                 </NavLink>
               )}
 

@@ -1,12 +1,12 @@
 import { ShieldCheck, Sparkles, Store, Package } from 'lucide-react'
 
-const HIGHLIGHTS = [
+const DEFAULT_HIGHLIGHTS = [
   { icon: Package, text: 'Browse a growing catalog of real shops' },
   { icon: Store, text: 'Open your own shop in minutes' },
   { icon: ShieldCheck, text: 'Verified sellers, reviewed by admins' },
 ]
 
-const AuthShell = ({ badge, heading, subheading, children }) => (
+const AuthShell = ({ badge, heading, subheading, highlights = DEFAULT_HIGHLIGHTS, children }) => (
   <div className="mx-auto flex w-full max-w-6xl flex-1 items-center px-6 py-10">
     <div className="grid w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid-cols-5 dark:border-slate-800 dark:bg-slate-900">
       <div className="relative hidden flex-col justify-center overflow-hidden bg-linear-to-br from-indigo-100 via-sky-100 to-cyan-100 px-10 py-14 text-slate-900 lg:col-span-2 lg:flex dark:from-indigo-950 dark:via-slate-900 dark:to-cyan-950 dark:text-slate-100">
@@ -22,7 +22,7 @@ const AuthShell = ({ badge, heading, subheading, children }) => (
           <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">{subheading}</p>
 
           <ul className="mt-8 space-y-3">
-            {HIGHLIGHTS.map(({ icon: Icon, text }) => (
+            {highlights.map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-200">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/70 text-indigo-600 ring-1 ring-indigo-200 dark:bg-white/10 dark:text-indigo-300 dark:ring-white/10">
                   <Icon size={14} />

@@ -32,11 +32,13 @@ const Footer = () => {
                   Browse products
                 </Link>
               </li>
-              <li>
-                <Link to="/my-shop" className="text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400">
-                  Open a shop
-                </Link>
-              </li>
+              {currentUser?.role === 'customer' && (
+                <li>
+                  <Link to="/my-shop" className="text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400">
+                    Open a shop
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

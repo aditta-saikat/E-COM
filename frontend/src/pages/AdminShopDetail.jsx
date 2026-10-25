@@ -17,7 +17,7 @@ import { listShops } from '../api/shops'
 import { listAllOrders } from '../api/orders'
 import { listAllCarts } from '../api/cart'
 import ProductsManager from '../components/ProductsManager'
-import AdminOrdersTable from '../components/AdminOrdersTable'
+import OrdersTable from '../components/OrdersTable'
 import AdminCartsTable from '../components/AdminCartsTable'
 
 const STATUS_META = {
@@ -91,7 +91,7 @@ const AdminShopDetail = () => {
   const StatusIcon = statusMeta?.icon
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8">
+    <div className="mx-auto max-w-6xl px-6 py-8">
       <Link
         to="/admin/shops"
         className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
@@ -191,7 +191,7 @@ const AdminShopDetail = () => {
         (orders === null ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">Loading...</p>
         ) : (
-          <AdminOrdersTable orders={orders} emptyMessage="This shop has no orders yet." />
+          <OrdersTable orders={orders} emptyMessage="This shop has no orders yet." />
         ))}
 
       {tab === 'cart' &&
