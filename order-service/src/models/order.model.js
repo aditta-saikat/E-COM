@@ -34,6 +34,8 @@ const orderSchema = new mongoose.Schema(
       default: 'pending_payment',
     },
     paymentId: { type: String, default: '' },
+    // true while the customer is on a redirect gateway's page; stale ones are cancelled and their stock released
+    awaitingPayment: { type: Boolean, default: false, index: true },
     shippingAddress: { type: shippingAddressSchema, default: () => ({}) },
   },
   { timestamps: true },

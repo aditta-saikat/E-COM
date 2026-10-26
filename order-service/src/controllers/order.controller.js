@@ -15,11 +15,15 @@ const createOrder = async (req, res, next) => {
       address: req.body.shippingAddress?.address || '',
     };
 
-    const result = await orderService.checkout(req.user.uid, req.bearerToken, shippingAddress);
+    const result = await orderService.checkout(req.user.uid, req.bearerToken, shippingAddress, req.user.email);
 
     if (result.error) {
       const [status, message] = ERROR_RESPONSES[result.error] || [500, 'Could not place order'];
       return res.status(status).json({ error: message, details: result.details, order: result.order });
+    }
+
+    if (result.paymentUrl) {
+      return res.status(201).json({ ...result.order.toObject(), paymentUrl: result.paymentUrl });
     }
 
     return res.status(201).json(result.order);
@@ -53,4 +57,21 @@ const getOrder = async (req, res) => {
   return res.status(200).json(result.order);
 };
 
-module.exports = { createOrder, listOrders, listAllOrders, getOrder };
+const applyPaymentResult = async (req, res, next) => {
+  try {
+    const result = await orderService.applyPaymentResult(req.params.id, {
+      paymentId: String(req.body.paymentId || ''),
+      status: req.body.status,
+    });
+
+    if (result.error === 'not_found') {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    return res.status(200).json({ status: result.order.status });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = { createOrder, applyPaymentResult, listOrders, listAllOrders, getOrder };

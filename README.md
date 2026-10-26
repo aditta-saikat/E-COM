@@ -25,6 +25,9 @@ frontend ──► auth-service            login / signup / profile
                             ├─► product-catalog-service (verify, decrement/increment stock; internal key)
                             └─► payment-service         (charge; internal key)
 
+payment-service ──► order-service   (redirect payments: reports the result; internal key)
+order-service   ──► cart-service    (clears a cart after a redirect payment; internal key)
+
 product-catalog-service ──► auth-service   (sets role to shop_admin when a shop is approved; internal key)
 ```
 
@@ -39,7 +42,8 @@ product-catalog-service ──► auth-service   (sets role to shop_admin when a
 1. order-service fetches the user's cart (forwarding their JWT).
 2. It asks catalog to verify availability and current prices.
 3. It creates the order as `pending_payment`, then decrements stock per item (atomic `$inc` guarded by `stock >= quantity`).
-4. It calls payment-service. On success the order becomes `paid` and the cart is cleared. On failure stock is rolled back and the order is marked `payment_failed` (or `failed_stock`).
+4. It calls payment-service. With the `mock` and `stripe` providers the answer is immediate: on success the order becomes `paid` and the cart is cleared, on failure stock is rolled back and the order is marked `payment_failed` (or `failed_stock`).
+5. With **SSLCommerz** (a redirect gateway) payment-service returns a hosted-page URL instead. The order stays `pending_payment` with its stock reserved, and the browser is sent to SSLCommerz. After the customer pays, SSLCommerz sends them back to payment-service, which verifies the payment with SSLCommerz, tells order-service the result (paid, or stock released) and redirects the browser to `/orders/:id?payment=...`. Unfinished orders are cancelled after 30 minutes.
 
 Prices are stored as integer **minor units** (e.g. paisa) everywhere.
 
@@ -99,7 +103,7 @@ cd frontend && npm install && npm run dev                # 5173
 | Variable | Must be identical in | Notes |
 | --- | --- | --- |
 | `JWT_SECRET` | auth, product-catalog, cart, order | Long random string |
-| `INTERNAL_API_KEY` | auth, product-catalog, order, payment | Long random string |
+| `INTERNAL_API_KEY` | auth, product-catalog, cart, order, payment | Long random string |
 | `MONGODB_URI` | one value per service | One clean line. Prefer a separate database name per service |
 
 For Docker, the shared values go in the root `.env` (see `.env.example`).

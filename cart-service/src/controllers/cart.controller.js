@@ -53,4 +53,9 @@ const clearCart = async (req, res) => {
   return res.status(204).send();
 };
 
-module.exports = { getCart, listAllCarts, addItem, updateItem, removeItem, clearCart };
+const clearCartForUser = async (req, res) => {
+  await cartService.clearCart(req.params.userId);
+  return res.status(204).send();
+};
+
+module.exports = { getCart, listAllCarts, addItem, updateItem, removeItem, clearCart, clearCartForUser };

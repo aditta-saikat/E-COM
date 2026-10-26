@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { CreditCard, ChevronLeft, MapPin, Package, Phone, ReceiptText, User } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { CheckCircle2, Clock, CreditCard, ChevronLeft, MapPin, Package, Phone, ReceiptText, User, XCircle } from 'lucide-react'
 import { getOrder } from '../api/orders'
 import { formatPrice } from '../lib/formatPrice'
 import PageHeader from '../components/PageHeader'
+import { useCart } from '../context/CartContext'
 
 const STATUS_META = {
   pending_payment: { label: 'Pending payment', className: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300' },
@@ -13,16 +14,59 @@ const STATUS_META = {
   cancelled: { label: 'Cancelled', className: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' },
 }
 
+const RETURN_BANNERS = {
+  paid: { icon: CheckCircle2, className: 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300', text: 'Payment received. Thank you for your order!' },
+  pending_payment: { icon: Clock, className: 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300', text: 'We are confirming your payment. This page updates automatically.' },
+  payment_failed: { icon: XCircle, className: 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300', text: 'Your payment did not go through. Your cart is still saved, so you can try again.' },
+  cancelled: { icon: XCircle, className: 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300', text: 'You cancelled the payment. Your cart is still saved, so you can try again.' },
+}
+
+const POLL_INTERVAL_MS = 3000
+const MAX_POLLS = 10
+
 const OrderDetail = () => {
   const { id } = useParams()
+  const [searchParams] = useSearchParams()
+  const returnedFromGateway = searchParams.has('payment')
+  const { refresh } = useCart()
+  const refreshCart = useRef(refresh)
   const [order, setOrder] = useState(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    getOrder(id)
-      .then((data) => setOrder(data.order || data))
-      .catch(() => setError('Could not load this order'))
-  }, [id])
+    refreshCart.current = refresh
+  })
+
+  useEffect(() => {
+    let cancelled = false
+    let polls = 0
+    let timer
+
+    const load = () => {
+      getOrder(id)
+        .then((data) => {
+          if (cancelled) return
+          const loaded = data.order || data
+          setOrder(loaded)
+
+          // Right after returning from the gateway the result can lag a moment behind the redirect.
+          if (returnedFromGateway && loaded.status === 'pending_payment' && polls < MAX_POLLS) {
+            polls += 1
+            timer = setTimeout(load, POLL_INTERVAL_MS)
+          } else if (returnedFromGateway) {
+            refreshCart.current()
+          }
+        })
+        .catch(() => !cancelled && setError('Could not load this order'))
+    }
+
+    load()
+
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [id, returnedFromGateway])
 
   if (error) {
     return <p className="p-6 text-sm text-rose-600 dark:text-rose-400">{error}</p>
@@ -43,6 +87,16 @@ const OrderDetail = () => {
         <ChevronLeft size={15} />
         Back to orders
       </Link>
+
+      {returnedFromGateway && RETURN_BANNERS[order.status] && (
+        <div role="status" className={`mb-6 flex items-center gap-3 rounded-2xl border p-4 text-sm ${RETURN_BANNERS[order.status].className}`}>
+          {(() => {
+            const BannerIcon = RETURN_BANNERS[order.status].icon
+            return <BannerIcon size={18} className="shrink-0" />
+          })()}
+          {RETURN_BANNERS[order.status].text}
+        </div>
+      )}
 
       <PageHeader
         icon={ReceiptText}

@@ -14,9 +14,16 @@ router.post(
     body('userId').isString().notEmpty(),
     body('amount').isInt({ min: 0 }),
     body('currency').isString().notEmpty(),
+    body('customer').optional().isObject(),
   ],
   paymentController.charge,
 );
+
+// Public: called by SSLCommerz, trusted only after the payment is verified with SSLCommerz.
+router.all('/sslcommerz/success', paymentController.sslcommerzCallback('success'));
+router.all('/sslcommerz/fail', paymentController.sslcommerzCallback('fail'));
+router.all('/sslcommerz/cancel', paymentController.sslcommerzCallback('cancel'));
+router.all('/sslcommerz/ipn', paymentController.sslcommerzCallback('ipn'));
 
 router.get('/lookup', requireInternalKey, query('orderId').isString().notEmpty(), paymentController.getPaymentByOrder);
 router.get('/:id', requireInternalKey, paymentController.getPayment);
