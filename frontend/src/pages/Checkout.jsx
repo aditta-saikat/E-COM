@@ -37,11 +37,17 @@ const Checkout = () => {
 
     try {
       const order = await createOrder({ fullName: fullName.trim(), phone: phone.trim(), address: address.trim() })
+
+      // Redirect gateways (SSLCommerz): the customer pays on the gateway's page and returns to the order page.
+      if (order.paymentUrl) {
+        window.location.assign(order.paymentUrl)
+        return
+      }
+
       await refresh()
       navigate(`/orders/${order._id}`)
     } catch (err) {
       setError(err.response?.data?.error || 'Could not place your order')
-    } finally {
       setSubmitting(false)
     }
   }
@@ -115,7 +121,7 @@ const Checkout = () => {
             {submitting ? 'Placing order…' : 'Place order'}
           </button>
           <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
-            Payment is processed securely when you place the order.
+            You may be redirected to our payment partner to complete your payment securely.
           </p>
         </OrderSummary>
       </form>

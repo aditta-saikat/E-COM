@@ -24,4 +24,15 @@ const clearCart = async (bearerToken) => {
   }
 };
 
-module.exports = { getCart, clearCart };
+const clearCartForUser = async (userId) => {
+  const response = await fetch(`${process.env.CART_SERVICE_URL}/api/cart/internal/${userId}`, {
+    method: 'DELETE',
+    headers: { 'X-Internal-Api-Key': process.env.INTERNAL_API_KEY },
+  });
+
+  if (!response.ok && response.status !== 204) {
+    logger.error({ userId, status: response.status }, 'cart-service clearCartForUser failed');
+  }
+};
+
+module.exports = { getCart, clearCart, clearCartForUser };

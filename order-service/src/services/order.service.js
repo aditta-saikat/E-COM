@@ -8,7 +8,7 @@ const rollbackStock = async (decremented) => {
   await Promise.all(decremented.map(({ productId, quantity }) => productCatalogClient.incrementStock(productId, quantity)));
 };
 
-const checkout = async (userId, bearerToken, shippingAddress) => {
+const checkout = async (userId, bearerToken, shippingAddress, customerEmail) => {
   const cart = await cartClient.getCart(bearerToken);
 
   if (!cart.items || cart.items.length === 0) {
@@ -74,9 +74,27 @@ const checkout = async (userId, bearerToken, shippingAddress) => {
       userId,
       amount: total,
       currency,
+      customer: {
+        name: shippingAddress.fullName,
+        email: customerEmail,
+        phone: shippingAddress.phone,
+        address: shippingAddress.address,
+      },
     });
   } catch (error) {
     logger.error({ err: error, orderId: order._id }, 'Payment request errored - outcome unknown, check the payment provider');
+  }
+
+  // Redirect gateway: the customer pays on the gateway's page. Stock stays reserved and the cart is kept until
+  // payment-service reports the result through applyPaymentResult.
+  if (payment?.redirectUrl) {
+    order.paymentId = payment._id;
+    order.awaitingPayment = true;
+    await order.save();
+
+    logger.info({ orderId: order._id, userId }, 'Order created, waiting for payment on the gateway');
+
+    return { order, paymentUrl: payment.redirectUrl };
   }
 
   if (!payment || payment.status !== 'succeeded') {
@@ -96,6 +114,69 @@ const checkout = async (userId, bearerToken, shippingAddress) => {
   logger.info({ orderId: order._id, userId, total }, 'Order placed successfully');
 
   return { order };
+};
+
+// Called by payment-service once a redirect payment ends. Idempotent: only an order that is still pending changes.
+const applyPaymentResult = async (orderId, { paymentId, status }) => {
+  const order = await Order.findById(orderId);
+
+  if (!order) {
+    return { error: 'not_found' };
+  }
+
+  if (order.status !== 'pending_payment') {
+    if (status === 'succeeded' && order.status !== 'paid') {
+      logger.error({ orderId, paymentId, orderStatus: order.status }, 'Payment succeeded for an order that is no longer pending - refund or reconcile manually');
+    }
+
+    return { order };
+  }
+
+  const nextStatus = { succeeded: 'paid', cancelled: 'cancelled' }[status] || 'payment_failed';
+
+  // Atomic, so a callback and an IPN arriving together cannot both apply their side effects.
+  const updated = await Order.findOneAndUpdate(
+    { _id: orderId, status: 'pending_payment' },
+    { $set: { status: nextStatus, paymentId, awaitingPayment: false } },
+    { returnDocument: 'after' },
+  );
+
+  if (!updated) {
+    return { order: await Order.findById(orderId) };
+  }
+
+  if (nextStatus === 'paid') {
+    await cartClient.clearCartForUser(updated.userId);
+    logger.info({ orderId, userId: updated.userId }, 'Order paid');
+  } else {
+    await rollbackStock(updated.items.map(({ productId, quantity }) => ({ productId, quantity })));
+    logger.warn({ orderId, status: nextStatus }, 'Payment did not complete, stock released');
+  }
+
+  return { order: updated };
+};
+
+// Cancels orders whose customer never came back from the gateway, releasing the reserved stock.
+const expireStaleOrders = async (maxAgeMinutes = 30) => {
+  const cutoff = new Date(Date.now() - maxAgeMinutes * 60 * 1000);
+  const stale = await Order.find({ status: 'pending_payment', awaitingPayment: true, createdAt: { $lt: cutoff } });
+
+  for (const order of stale) {
+    // eslint-disable-next-line no-await-in-loop
+    const updated = await Order.findOneAndUpdate(
+      { _id: order._id, status: 'pending_payment' },
+      { $set: { status: 'cancelled', awaitingPayment: false } },
+      { returnDocument: 'after' },
+    );
+
+    if (updated) {
+      // eslint-disable-next-line no-await-in-loop
+      await rollbackStock(updated.items.map(({ productId, quantity }) => ({ productId, quantity })));
+      logger.warn({ orderId: updated._id }, 'Expired unpaid order, stock released');
+    }
+  }
+
+  return stale.length;
 };
 
 const listOrders = async (userId) => Order.find({ userId }).sort({ createdAt: -1 });
@@ -128,4 +209,4 @@ const getOrder = async (id, userId, isAdmin) => {
   return { order };
 };
 
-module.exports = { checkout, listOrders, listAllOrders, getOrder };
+module.exports = { checkout, applyPaymentResult, expireStaleOrders, listOrders, listAllOrders, getOrder };

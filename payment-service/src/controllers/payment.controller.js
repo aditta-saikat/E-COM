@@ -8,8 +8,12 @@ const charge = async (req, res, next) => {
   }
 
   try {
-    const { orderId, userId, amount, currency } = req.body;
-    const payment = await paymentService.charge({ orderId, userId, amount, currency });
+    const { orderId, userId, amount, currency, customer } = req.body;
+    const { payment, redirectUrl } = await paymentService.charge({ orderId, userId, amount, currency, customer });
+
+    if (redirectUrl) {
+      return res.status(202).json({ ...payment.toObject(), redirectUrl });
+    }
 
     return res.status(payment.status === 'succeeded' ? 201 : 402).json(payment);
   } catch (error) {
@@ -37,4 +41,29 @@ const getPaymentByOrder = async (req, res) => {
   return res.status(200).json(payment);
 };
 
-module.exports = { charge, getPayment, getPaymentByOrder };
+const RETURN_RESULTS = { succeeded: 'success', cancelled: 'cancelled', pending: 'pending' };
+
+// SSLCommerz calls these from the customer's browser (success / fail / cancel) and from its servers (ipn).
+const sslcommerzCallback = (outcome) => async (req, res, next) => {
+  try {
+    const payment = await paymentService.completeSslcommerzPayment(outcome, { ...req.query, ...req.body });
+
+    if (outcome === 'ipn') {
+      return res.status(200).json({ received: true });
+    }
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+    if (!payment) {
+      return res.redirect(303, `${frontendUrl}/orders`);
+    }
+
+    const result = RETURN_RESULTS[payment.status] || 'failed';
+
+    return res.redirect(303, `${frontendUrl}/orders/${payment.orderId}?payment=${result}`);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = { charge, getPayment, getPaymentByOrder, sslcommerzCallback };

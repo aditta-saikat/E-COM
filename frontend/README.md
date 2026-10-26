@@ -65,6 +65,10 @@ Used for the profile photo (Profile → Edit) and product images (add/edit produ
 
 Replaced or removed images stay on ImgBB (the free API cannot delete them). Only the saved link changes.
 
+## Payments
+
+Checkout posts to order-service. If the response contains `paymentUrl` (a redirect gateway such as SSLCommerz) the browser goes there with `window.location.assign`. The gateway returns the customer to `/orders/:id?payment=success|failed|cancelled|pending`. `OrderDetail` then shows a status banner, polls the order every 3 seconds (up to 10 times) while it is still `pending_payment`, and refreshes the cart once the result is known.
+
 ## Tokens
 
 The JWT is stored in `localStorage` (`ecom_token`) and attached to every request by the axios interceptor. This is simple but readable by any XSS. An httpOnly cookie would be safer for production.

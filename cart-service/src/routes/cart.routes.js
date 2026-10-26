@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 
 const cartController = require('../controllers/cart.controller');
 const { requireAuth, requireRole } = require('../middleware/auth.middleware');
+const { requireInternalKey } = require('../middleware/internal.middleware');
 
 const router = Router();
 
@@ -22,5 +23,7 @@ router.patch(
 );
 router.delete('/items/:productId', requireAuth, cartController.removeItem);
 router.delete('/', requireAuth, cartController.clearCart);
+// Internal: order-service empties a cart after a redirect payment completes (no user token is available then).
+router.delete('/internal/:userId', requireInternalKey, cartController.clearCartForUser);
 
 module.exports = router;
