@@ -209,4 +209,73 @@ const getOrder = async (id, userId, isAdmin) => {
   return { order };
 };
 
-module.exports = { checkout, applyPaymentResult, expireStaleOrders, listOrders, listAllOrders, getOrder };
+const DAY_MS = 24 * 60 * 60 * 1000;
+const CHART_DAYS = 14;
+
+const dayKey = (date) => date.toISOString().slice(0, 10);
+
+// Sales figures for one shop: only the shop's own line items count, and only paid orders count as sales.
+const getShopSummary = async (shopId) => {
+  const orders = await Order.find({ 'items.shopId': shopId }).sort({ createdAt: -1 });
+
+  const today = new Date();
+  const daily = new Map();
+
+  for (let i = CHART_DAYS - 1; i >= 0; i -= 1) {
+    daily.set(dayKey(new Date(today.getTime() - i * DAY_MS)), { revenue: 0, orders: 0 });
+  }
+
+  const summary = { revenue: 0, unitsSold: 0, paidOrders: 0, pendingOrders: 0, unsuccessfulOrders: 0 };
+  const customers = new Set();
+  const byProduct = new Map();
+  const recent = [];
+  let currency = 'BDT';
+
+  for (const order of orders) {
+    const shopItems = order.items.filter((item) => item.shopId === shopId);
+    const shopTotal = shopItems.reduce((sum, item) => sum + item.subtotal, 0);
+
+    currency = order.currency || currency;
+
+    if (recent.length < 6) {
+      recent.push({ _id: order._id, status: order.status, createdAt: order.createdAt, total: shopTotal, units: shopItems.reduce((sum, item) => sum + item.quantity, 0) });
+    }
+
+    if (order.status === 'pending_payment') {
+      summary.pendingOrders += 1;
+    } else if (order.status !== 'paid') {
+      summary.unsuccessfulOrders += 1;
+    } else {
+      summary.paidOrders += 1;
+      summary.revenue += shopTotal;
+      customers.add(order.userId);
+
+      const bucket = daily.get(dayKey(order.createdAt));
+
+      if (bucket) {
+        bucket.revenue += shopTotal;
+        bucket.orders += 1;
+      }
+
+      for (const item of shopItems) {
+        summary.unitsSold += item.quantity;
+        const entry = byProduct.get(item.productId) || { productId: item.productId, name: item.name, units: 0, revenue: 0 };
+        entry.units += item.quantity;
+        entry.revenue += item.subtotal;
+        byProduct.set(item.productId, entry);
+      }
+    }
+  }
+
+  return {
+    currency,
+    ...summary,
+    customers: customers.size,
+    averageOrderValue: summary.paidOrders ? Math.round(summary.revenue / summary.paidOrders) : 0,
+    daily: [...daily].map(([date, values]) => ({ date, ...values })),
+    topProducts: [...byProduct.values()].sort((a, b) => b.units - a.units).slice(0, 5),
+    recentOrders: recent,
+  };
+};
+
+module.exports = { getShopSummary, checkout, applyPaymentResult, expireStaleOrders, listOrders, listAllOrders, getOrder };

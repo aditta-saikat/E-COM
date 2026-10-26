@@ -4,6 +4,11 @@ import {
   ArrowRight,
   CheckCircle2,
   Clock,
+  PackagePlus,
+  PartyPopper,
+  ShoppingBag,
+  Sparkles,
+  Truck,
   FileText,
   Loader2,
   LogOut,
@@ -122,9 +127,102 @@ const RequestShopForm = ({ onRequested }) => {
   )
 }
 
-const ShopDetails = ({ shop, onUpdated }) => {
+const ReLoginNotice = () => {
   const { logout } = useAuth()
   const navigate = useNavigate()
+
+  const handleReLogin = () => {
+    logout()
+    navigate('/login')
+  }
+
+  return (
+    <div className="mb-6 flex flex-col items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+      <p>Your shop was approved, but your current session still has your old permissions. Log in again to start adding products.</p>
+      <button
+        type="button"
+        onClick={handleReLogin}
+        className="flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-amber-500"
+      >
+        <LogOut size={14} />
+        Log out now
+      </button>
+    </div>
+  )
+}
+
+const NEXT_STEPS = [
+  { icon: PackagePlus, title: 'Add your products', text: 'Photos, prices and stock. Customers see them as soon as you save.', to: '/my-products', cta: 'Add a product' },
+  { icon: ShoppingBag, title: 'Get your first order', text: 'Orders for your products are fulfilled per shop, so keep stock up to date.' },
+  { icon: Truck, title: 'Keep customers happy', text: 'Accurate stock and clear descriptions mean fewer cancelled orders.' },
+]
+
+const ShopWelcome = ({ shop }) => {
+  const needsRelogin = tokenRole() !== 'shop_admin'
+
+  return (
+    <div className="mx-auto max-w-6xl animate-fade-in-up px-6 py-8">
+      <PageHeader icon={Store} title="My shop" subtitle="Your shop is part of the platform." />
+
+      {needsRelogin && <ReLoginNotice />}
+
+      <section className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-emerald-50 p-8 shadow-sm sm:p-10 dark:border-slate-800 dark:from-indigo-500/10 dark:via-slate-900 dark:to-emerald-500/10">
+        <Sparkles aria-hidden size={140} className="pointer-events-none absolute -right-6 -top-6 text-indigo-200/60 dark:text-indigo-400/10" />
+
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20">
+          <CheckCircle2 size={13} />
+          Approved
+        </span>
+
+        <h2 className="font-display mt-5 flex flex-wrap items-center gap-3 text-3xl font-bold text-slate-900 dark:text-slate-100">
+          Welcome to E-COM, {shop.name}!
+          <PartyPopper aria-hidden size={28} className="text-amber-500" />
+        </h2>
+        <p className="mt-3 max-w-2xl text-slate-600 dark:text-slate-300">
+          You are now part of the platform. Your shop is live and customers can find it. Everything is ready, so all that is left is to stock your shelves.
+        </p>
+
+        {shop.description && (
+          <p className="mt-4 max-w-2xl rounded-xl bg-white/70 px-4 py-3 text-sm italic text-slate-500 ring-1 ring-slate-100 dark:bg-slate-900/60 dark:text-slate-400 dark:ring-slate-800">
+            “{shop.description}”
+          </p>
+        )}
+
+        <Link
+          to="/my-products"
+          className="group mt-7 inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400"
+        >
+          Manage products
+          <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
+        </Link>
+      </section>
+
+      <h3 className="font-display mb-4 mt-10 text-lg font-bold text-slate-900 dark:text-slate-100">What happens next</h3>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {NEXT_STEPS.map(({ icon: Icon, title, text, to, cta }, index) => (
+          <div key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-300">
+                <Icon size={18} />
+              </span>
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Step {index + 1}</span>
+            </div>
+            <h4 className="mt-3 font-semibold text-slate-900 dark:text-slate-100">{title}</h4>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{text}</p>
+            {to && (
+              <Link to={to} className="group mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                {cta}
+                <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+              </Link>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const ShopDetails = ({ shop, onUpdated }) => {
   const [name, setName] = useState(shop.name)
   const [description, setDescription] = useState(shop.description)
   const [error, setError] = useState('')
@@ -132,8 +230,6 @@ const ShopDetails = ({ shop, onUpdated }) => {
   const [submitting, setSubmitting] = useState(false)
   const statusMeta = STATUS_META[shop.status]
   const StatusIcon = statusMeta.icon
-  const needsRelogin = shop.status === 'approved' && tokenRole() !== 'shop_admin'
-
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
@@ -150,28 +246,9 @@ const ShopDetails = ({ shop, onUpdated }) => {
     }
   }
 
-  const handleReLogin = () => {
-    logout()
-    navigate('/login')
-  }
-
   return (
     <div className="mx-auto max-w-6xl animate-fade-in-up px-6 py-8">
       <PageHeader icon={Store} title="My shop" subtitle="Your shop details and approval status." />
-
-      {needsRelogin && (
-        <div className="mb-6 flex flex-col items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
-          <p>Your shop was approved, but your current session still has your old permissions. Log in again to start adding products.</p>
-          <button
-            type="button"
-            onClick={handleReLogin}
-            className="flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-amber-500"
-          >
-            <LogOut size={14} />
-            Log out now
-          </button>
-        </div>
-      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -253,6 +330,10 @@ const MyShop = () => {
 
   if (shop === null) {
     return <RequestShopForm onRequested={setShop} />
+  }
+
+  if (shop.status === 'approved') {
+    return <ShopWelcome shop={shop} />
   }
 
   return <ShopDetails shop={shop} onUpdated={setShop} />

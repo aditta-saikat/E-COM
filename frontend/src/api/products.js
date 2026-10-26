@@ -25,3 +25,8 @@ export const updateProduct = async (id, updates) => {
 export const deleteProduct = async (id) => {
   await catalogClient.delete(`/api/products/${id}`)
 }
+
+export const getInventorySummary = async () => {
+  const response = await catalogClient.get('/api/products/mine/summary')
+  return response.data
+}

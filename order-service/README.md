@@ -26,6 +26,7 @@ Order totals use catalog prices, never client-supplied values.
 | GET | `/api/orders` | The caller's orders. |
 | GET | `/api/orders/:id` | One order. Owner or admin only. |
 | POST | `/api/orders/:id/payment-result` | Internal key only. Body `{ paymentId, status }`. Called by payment-service. |
+| GET | `/api/orders/shop/summary` | `shop_admin` only. Sales for the caller's approved shop (found via the catalog with the caller's own token, so another shop cannot be requested): `revenue`, `unitsSold`, `paidOrders`, `pendingOrders`, `unsuccessfulOrders`, `customers`, `averageOrderValue`, a 14-day `daily` series, `topProducts` and `recentOrders`. Only the shop's own line items count, and only `paid` orders count as sales. |
 | GET | `/api/orders/admin` | Admin only. Optional `?status=` and `?shopId=`. |
 
 Order statuses: `pending_payment`, `paid`, `payment_failed`, `failed_stock`, `cancelled`.

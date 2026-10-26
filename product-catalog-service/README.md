@@ -15,6 +15,7 @@ Shops and products, plus the stock operations used by checkout. Port **3002**.
 | Method | Path | Auth | Description |
 | --- | --- | --- | --- |
 | GET | `/api/products` | none | Query: `search`, `category`, `shopId`, `page` (20 per page). Returns `{ items, total, page, pageSize }`. |
+| GET | `/api/products/mine/summary` | Bearer, `shop_admin` | Inventory snapshot for the caller's active listings: `products`, `unitsInStock`, `inventoryValue`, `outOfStock`, `lowStock` (5 or fewer), `needsAttention` (up to 5). |
 | GET | `/api/products/:id` | none | One active product. |
 | POST | `/api/products` | Bearer, `shop_admin` or `admin` | Body `{ name, price, sku, stock?, category?, images?, description? }`. Admins must also send `shopId`. |
 | PATCH | `/api/products/:id` | Bearer (owner or admin) | Update a product. |

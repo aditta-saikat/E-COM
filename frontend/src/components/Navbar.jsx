@@ -50,10 +50,12 @@ const Navbar = () => {
             </NavLink>
           )}
 
-          <NavLink to="/products" className={linkClass}>
-            <Package size={16} />
-            <span className="hidden sm:inline">Products</span>
-          </NavLink>
+          {currentUser?.role !== 'shop_admin' && (
+            <NavLink to="/products" className={linkClass}>
+              <Package size={16} />
+              <span className="hidden sm:inline">Products</span>
+            </NavLink>
+          )}
 
           {currentUser ? (
             <>
@@ -90,6 +92,7 @@ const Navbar = () => {
                 <span className="hidden sm:inline">Orders</span>
               </NavLink>
 
+              {currentUser.role !== 'shop_admin' && (
               <NavLink to={currentUser.role === 'admin' ? '/admin/carts' : '/cart'} className={linkClass}>
                 <span className="relative">
                   <ShoppingCart size={16} />
@@ -101,6 +104,7 @@ const Navbar = () => {
                 </span>
                 <span className="hidden sm:inline">Cart</span>
               </NavLink>
+              )}
 
               <NavLink to="/profile" className={linkClass}>
                 <UserCircle size={16} />

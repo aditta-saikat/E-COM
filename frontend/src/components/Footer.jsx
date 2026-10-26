@@ -27,11 +27,13 @@ const Footer = () => {
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Marketplace</p>
             <ul className="mt-3 space-y-2 text-sm">
-              <li>
-                <Link to="/products" className="text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400">
-                  Browse products
-                </Link>
-              </li>
+              {currentUser?.role !== 'shop_admin' && (
+                <li>
+                  <Link to="/products" className="text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400">
+                    Browse products
+                  </Link>
+                </li>
+              )}
               {currentUser?.role === 'customer' && (
                 <li>
                   <Link to="/my-shop" className="text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400">

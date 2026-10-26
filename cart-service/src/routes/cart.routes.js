@@ -12,6 +12,7 @@ router.get('/admin', requireAuth, requireRole('admin'), cartController.listAllCa
 router.post(
   '/items',
   requireAuth,
+  requireRole('customer', 'admin'),
   [body('productId').isString().notEmpty(), body('quantity').isInt({ min: 1 })],
   cartController.addItem,
 );

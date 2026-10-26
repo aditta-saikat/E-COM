@@ -9,6 +9,11 @@ const getProducts = async (req, res) => {
   return res.status(200).json(result);
 };
 
+const getMyInventorySummary = async (req, res) => {
+  const summary = await productService.getInventorySummary(req.user.uid);
+  return res.status(200).json(summary);
+};
+
 const getProduct = async (req, res) => {
   const product = await productService.getProductById(req.params.id);
 
@@ -122,6 +127,7 @@ const incrementStock = async (req, res) => {
 };
 
 module.exports = {
+  getMyInventorySummary,
   getProducts,
   getProduct,
   createProduct,

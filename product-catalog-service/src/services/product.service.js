@@ -27,6 +27,28 @@ const listProducts = async ({ category, search, page = 1, shopId } = {}) => {
   return { items, total, page: Math.max(Number(page), 1), pageSize: PAGE_SIZE };
 };
 
+const LOW_STOCK_THRESHOLD = 5;
+
+// Inventory snapshot for one shop owner's active listings.
+const getInventorySummary = async (ownerUid) => {
+  const products = await Product.find({ createdBy: ownerUid, isActive: true }).select('name stock price currency images');
+
+  const outOfStock = products.filter((product) => product.stock === 0);
+  const lowStock = products.filter((product) => product.stock > 0 && product.stock <= LOW_STOCK_THRESHOLD);
+
+  return {
+    products: products.length,
+    unitsInStock: products.reduce((sum, product) => sum + product.stock, 0),
+    inventoryValue: products.reduce((sum, product) => sum + product.stock * product.price, 0),
+    outOfStock: outOfStock.length,
+    lowStock: lowStock.length,
+    lowStockThreshold: LOW_STOCK_THRESHOLD,
+    needsAttention: [...outOfStock, ...lowStock]
+      .slice(0, 5)
+      .map((product) => ({ _id: product._id, name: product.name, stock: product.stock })),
+  };
+};
+
 const getProductById = async (id) => Product.findById(id);
 
 const createProduct = async (data, createdBy, shopId) => Product.create({ ...data, createdBy, shopId });
@@ -116,6 +138,7 @@ const incrementStock = async (id, quantity) => {
 module.exports = {
   listProducts,
   getProductById,
+  getInventorySummary,
   createProduct,
   updateProduct,
   deleteProduct,
