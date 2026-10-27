@@ -68,7 +68,7 @@ const ProductsManager = ({ products, onCreate, onUpdate, onDelete, emptyMessage 
     const payload = {
       name: form.name,
       description: form.description,
-      price: Number(form.price),
+      price: Math.round(Number(form.price) * 100),
       sku: form.sku,
       stock: Number(form.stock || 0),
       category: form.category,
@@ -103,7 +103,7 @@ const ProductsManager = ({ products, onCreate, onUpdate, onDelete, emptyMessage 
     ? {
         name: editingProduct.name,
         description: editingProduct.description,
-        price: String(editingProduct.price),
+        price: String(editingProduct.price / 100),
         sku: editingProduct.sku,
         stock: String(editingProduct.stock),
         category: editingProduct.category,
@@ -173,52 +173,62 @@ const ProductsManager = ({ products, onCreate, onUpdate, onDelete, emptyMessage 
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-          <table className="w-full text-left text-[0.9375rem]">
-            <thead>
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <table className="w-full table-fixed text-left text-[0.9375rem]">
+            <thead className="bg-slate-50/80 dark:bg-slate-800/40">
               <tr className="border-b border-slate-200 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:border-slate-800 dark:text-slate-400">
-                <th className="px-6 py-3.5">Product</th>
-                <th className="px-6 py-3.5">Category</th>
-                <th className="px-6 py-3.5">Price</th>
-                <th className="px-6 py-3.5">Stock</th>
-                <th className="px-6 py-3.5" />
+                <th className="px-5 py-3.5">Product</th>
+                <th className="hidden w-36 px-3 py-3.5 md:table-cell">Category</th>
+                <th className="w-32 px-3 py-3.5 text-right">Price</th>
+                <th className="w-28 px-3 py-3.5 text-center">Stock</th>
+                <th className="w-24 px-5 py-3.5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filtered.map((product) => (
                 <tr key={product._id} className="transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-4">
                       {product.images?.[0] ? (
-                        <img src={product.images[0]} alt="" className="h-9 w-9 shrink-0 rounded-lg object-cover" />
+                        <img src={product.images[0]} alt="" className="h-12 w-12 shrink-0 rounded-xl bg-white object-contain p-0.5 ring-1 ring-slate-200 dark:ring-slate-700" />
                       ) : (
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-400 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-500">
+                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-400 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-500">
                           <Package size={16} />
                         </span>
                       )}
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900 dark:text-slate-100">{product.name}</p>
+                        <p className="truncate font-medium text-slate-900 dark:text-slate-100" title={product.name}>{product.name}</p>
                         <p className="truncate text-xs text-slate-500 dark:text-slate-400">{product.sku}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-slate-500 capitalize dark:text-slate-400">{product.category || '—'}</td>
-                  <td className="px-6 py-4 text-slate-700 dark:text-slate-300">{formatPrice(product.price, product.currency)}</td>
-                  <td className="px-6 py-4">
+                  <td className="hidden px-3 py-3 md:table-cell">
+                    {product.category ? (
+                      <span className="inline-block max-w-full truncate rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                        {product.category}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-3 text-right font-medium text-slate-800 tabular-nums dark:text-slate-200">
+                    {formatPrice(product.price, product.currency)}
+                  </td>
+                  <td className="px-3 py-3 text-center">
                     <span
-                      className={
+                      className={`inline-block min-w-12 rounded-full px-2.5 py-1 text-xs font-semibold ${
                         product.stock === 0
-                          ? 'text-rose-600 dark:text-rose-400'
+                          ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300'
                           : product.stock <= 3
-                            ? 'text-amber-600 dark:text-amber-400'
-                            : 'text-slate-700 dark:text-slate-300'
-                      }
+                            ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'
+                            : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+                      }`}
                     >
-                      {product.stock}
+                      {product.stock === 0 ? 'Out' : product.stock}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1">
+                  <td className="px-5 py-3">
+                    <div className="flex items-center justify-end gap-1">
                       <button
                         type="button"
                         onClick={() => openEdit(product)}

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { createProduct, deleteProduct, listProducts, updateProduct } from '../api/products'
 import { useAuth } from '../context/AuthContext'
+import { Package } from 'lucide-react'
+import PageHeader from '../components/PageHeader'
 import ProductsManager from '../components/ProductsManager'
 
 const MyProducts = () => {
@@ -32,8 +34,12 @@ const MyProducts = () => {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8">
-      <h1 className="font-display mb-6 text-2xl font-bold text-slate-900 dark:text-slate-100">My products</h1>
+    <div className="mx-auto max-w-6xl animate-fade-in-up px-6 py-8">
+      <PageHeader
+        icon={Package}
+        title="My products"
+        subtitle={`${products.length} ${products.length === 1 ? 'listing' : 'listings'} in your shop. Click the pencil to edit one.`}
+      />
 
       <ProductsManager
         products={products}
