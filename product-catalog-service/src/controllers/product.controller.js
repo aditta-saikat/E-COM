@@ -3,11 +3,13 @@ const productService = require('../services/product.service');
 const shopService = require('../services/shop.service');
 
 const getProducts = async (req, res) => {
-  const { category, search, page, shopId } = req.query;
-  const result = await productService.listProducts({ category, search, page, shopId });
+  const { category, search, page, shopId, sort } = req.query;
+  const result = await productService.listProducts({ category, search, page, shopId, sort });
 
   return res.status(200).json(result);
 };
+
+const getCategories = async (req, res) => res.status(200).json({ items: await productService.listCategories() });
 
 const getMyInventorySummary = async (req, res) => {
   const summary = await productService.getInventorySummary(req.user.uid);
@@ -127,6 +129,7 @@ const incrementStock = async (req, res) => {
 };
 
 module.exports = {
+  getCategories,
   getMyInventorySummary,
   getProducts,
   getProduct,

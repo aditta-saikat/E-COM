@@ -19,6 +19,7 @@ const productValidationRules = [
 const stockAdjustmentRules = [body('quantity').isInt({ min: 1 })];
 
 router.get('/', productController.getProducts);
+router.get('/categories', productController.getCategories);
 router.get('/mine/summary', requireAuth, requireRole('shop_admin'), productController.getMyInventorySummary);
 router.get('/:id', productController.getProduct);
 router.post(

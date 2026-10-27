@@ -5,6 +5,7 @@ import { getProduct } from '../api/products'
 import { formatPrice } from '../lib/formatPrice'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
+import ShopBadge from '../components/ShopBadge'
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -50,12 +51,13 @@ const ProductDetail = () => {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-8">
-      <div className="mb-6 flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-300 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-500">
+      <div className="relative mb-6 flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-linear-to-br from-indigo-50 to-cyan-50 text-indigo-300 dark:from-indigo-500/10 dark:to-cyan-500/10 dark:text-indigo-500">
         {product.images?.[0] ? (
           <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
         ) : (
           <Package size={56} strokeWidth={1.5} />
         )}
+        <ShopBadge shopId={product.shopId} className="absolute bottom-3 left-3 max-w-[70%] text-sm" />
       </div>
 
       <span className="mb-2 inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 capitalize dark:bg-slate-800 dark:text-slate-300">

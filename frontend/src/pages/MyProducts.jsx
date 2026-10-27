@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react'
-import { createProduct, deleteProduct, listProducts, updateProduct } from '../api/products'
-import { useAuth } from '../context/AuthContext'
+import { createProduct, deleteProduct, listAllProducts, updateProduct } from '../api/products'
+import { getMyShop } from '../api/shops'
 import { Package } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import ProductsManager from '../components/ProductsManager'
 
 const MyProducts = () => {
-  const { currentUser } = useAuth()
   const [products, setProducts] = useState([])
 
   const load = async () => {
-    const result = await listProducts()
-    setProducts(result.items.filter((product) => product.createdBy === currentUser._id))
+    const shop = await getMyShop()
+    setProducts(await listAllProducts({ shopId: shop._id }))
   }
 
   useEffect(() => {

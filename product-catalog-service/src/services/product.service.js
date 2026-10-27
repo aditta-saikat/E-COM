@@ -2,7 +2,11 @@ const Product = require('../models/product.model');
 
 const PAGE_SIZE = 20;
 
-const listProducts = async ({ category, search, page = 1, shopId } = {}) => {
+const SORTS = { 'price-asc': { price: 1 }, 'price-desc': { price: -1 } };
+
+const listCategories = async () => (await Product.distinct('category', { isActive: true })).filter(Boolean).sort();
+
+const listProducts = async ({ category, search, page = 1, shopId, sort } = {}) => {
   const filter = { isActive: true };
 
   if (category) {
@@ -20,7 +24,7 @@ const listProducts = async ({ category, search, page = 1, shopId } = {}) => {
   const skip = (Math.max(Number(page), 1) - 1) * PAGE_SIZE;
 
   const [items, total] = await Promise.all([
-    Product.find(filter).skip(skip).limit(PAGE_SIZE).sort({ createdAt: -1 }),
+    Product.find(filter).sort(SORTS[sort] || { createdAt: -1 }).skip(skip).limit(PAGE_SIZE),
     Product.countDocuments(filter),
   ]);
 
@@ -137,6 +141,7 @@ const incrementStock = async (id, quantity) => {
 
 module.exports = {
   listProducts,
+  listCategories,
   getProductById,
   getInventorySummary,
   createProduct,
