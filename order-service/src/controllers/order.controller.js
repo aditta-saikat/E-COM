@@ -1,4 +1,5 @@
 const orderService = require('../services/order.service');
+const productCatalogClient = require('../services/productCatalog.client');
 
 const ERROR_RESPONSES = {
   empty_cart: [400, 'Your cart is empty'],
@@ -43,6 +44,20 @@ const listAllOrders = async (req, res) => {
   return res.status(200).json({ items: orders });
 };
 
+const getShopSummary = async (req, res, next) => {
+  try {
+    const shop = await productCatalogClient.getMyShop(req.bearerToken);
+
+    if (!shop || shop.status !== 'approved') {
+      return res.status(404).json({ error: 'You do not have an approved shop' });
+    }
+
+    return res.status(200).json(await orderService.getShopSummary(String(shop._id)));
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const getOrder = async (req, res) => {
   const result = await orderService.getOrder(req.params.id, req.user.uid, req.user.role === 'admin');
 
@@ -74,4 +89,4 @@ const applyPaymentResult = async (req, res, next) => {
   }
 };
 
-module.exports = { createOrder, applyPaymentResult, listOrders, listAllOrders, getOrder };
+module.exports = { getShopSummary, createOrder, applyPaymentResult, listOrders, listAllOrders, getOrder };

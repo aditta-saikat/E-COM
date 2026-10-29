@@ -19,3 +19,8 @@ export const listAllOrders = async ({ shopId, status } = {}) => {
   const response = await orderClient.get('/api/orders/admin', { params: { shopId, status } })
   return response.data
 }
+
+export const getShopSummary = async () => {
+  const response = await orderClient.get('/api/orders/shop/summary')
+  return response.data
+}

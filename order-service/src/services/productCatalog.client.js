@@ -42,4 +42,19 @@ const incrementStock = async (productId, quantity) => {
   }
 };
 
-module.exports = { verifyItems, decrementStock, incrementStock };
+// Asks the catalog for the shop owned by whoever holds this token, so the caller cannot claim someone else's shop.
+const getMyShop = async (bearerToken) => {
+  const response = await fetch(`${process.env.PRODUCT_CATALOG_URL}/api/shops/mine`, {
+    headers: { Authorization: bearerToken },
+  });
+
+  if (response.status === 404) return null;
+
+  if (!response.ok) {
+    throw new Error(`product-catalog-service shops/mine failed with status ${response.status}`);
+  }
+
+  return response.json();
+};
+
+module.exports = { getMyShop, verifyItems, decrementStock, incrementStock };

@@ -12,7 +12,7 @@ import {
   User,
   XCircle,
 } from 'lucide-react'
-import { createProduct, deleteProduct, listProducts, updateProduct } from '../api/products'
+import { createProduct, deleteProduct, listAllProducts, updateProduct } from '../api/products'
 import { listShops } from '../api/shops'
 import { listAllOrders } from '../api/orders'
 import { listAllCarts } from '../api/cart'
@@ -44,12 +44,12 @@ const AdminShopDetail = () => {
   const [tab, setTab] = useState('products')
 
   const loadProducts = async () => {
-    const [shopsResult, productsResult] = await Promise.all([
+    const [shopsResult, shopProducts] = await Promise.all([
       listShops(),
-      listProducts({ shopId }),
+      listAllProducts({ shopId }),
     ])
     setShop(shopsResult.items.find((item) => item._id === shopId) || null)
-    setProducts(productsResult.items)
+    setProducts(shopProducts)
   }
 
   useEffect(() => {

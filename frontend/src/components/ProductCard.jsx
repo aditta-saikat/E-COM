@@ -4,6 +4,7 @@ import { Check, Loader2, Package, ShoppingCart } from 'lucide-react'
 import { formatPrice } from '../lib/formatPrice'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
+import ShopBadge from './ShopBadge'
 
 const ProductCard = ({ product }) => {
   const { currentUser } = useAuth()
@@ -39,6 +40,7 @@ const ProductCard = ({ product }) => {
           ) : (
             <Package size={36} strokeWidth={1.5} />
           )}
+          <ShopBadge shopId={product.shopId} className="absolute bottom-2 left-2 max-w-[85%]" />
           {product.stock <= 3 && product.stock > 0 && (
             <span className="absolute top-2 right-2 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
               Low stock

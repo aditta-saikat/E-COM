@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
-import { ArrowDownAZ, ChevronDown, PackageSearch, Search, SlidersHorizontal } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ArrowDownAZ, ChevronDown, ChevronLeft, ChevronRight, PackageSearch, Search, SlidersHorizontal } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
-import { listProducts } from '../api/products'
+import { listCategories, listProducts } from '../api/products'
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest first' },
@@ -11,27 +11,21 @@ const SORT_OPTIONS = [
 
 const selectClass = 'w-full appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pr-9 pl-9 text-sm text-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 sm:w-48 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
 
-const sortProducts = (items, sortBy) => {
-  if (sortBy === 'price-asc') return [...items].sort((a, b) => a.price - b.price)
-  if (sortBy === 'price-desc') return [...items].sort((a, b) => b.price - a.price)
-  return items
-}
-
 const Products = () => {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
   const [sortBy, setSortBy] = useState('newest')
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [pageSize, setPageSize] = useState(20)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    listProducts()
-      .then((result) => {
-        const unique = [...new Set((result.items ?? []).map((item) => item.category))].sort()
-        setCategories(unique)
-      })
+    listCategories()
+      .then(setCategories)
       .catch(() => {})
   }, [])
 
@@ -41,12 +35,14 @@ const Products = () => {
       setError('')
 
       try {
-        const result = await listProducts({ search, category: category || undefined })
+        const result = await listProducts({ search, category: category || undefined, sort: sortBy, page })
         if (!Array.isArray(result?.items)) {
           throw new Error('Unexpected response from product-catalog-service')
         }
 
         setProducts(result.items)
+        setTotal(result.total)
+        setPageSize(result.pageSize)
       } catch (err) {
         setError('Could not load products. Is product-catalog-service running?')
       } finally {
@@ -55,9 +51,14 @@ const Products = () => {
     }, 300)
 
     return () => clearTimeout(timeoutId)
-  }, [search, category])
+  }, [search, category, sortBy, page])
 
-  const sortedProducts = useMemo(() => sortProducts(products, sortBy), [products, sortBy])
+  const pageCount = Math.max(Math.ceil(total / pageSize), 1)
+
+  const changeFilter = (setter) => (event) => {
+    setter(event.target.value)
+    setPage(1)
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
@@ -70,7 +71,7 @@ const Products = () => {
             type="text"
             placeholder="Search products..."
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={changeFilter(setSearch)}
             className="w-full rounded-lg border border-slate-300 py-2.5 pr-3 pl-9 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder-slate-500"
           />
         </div>
@@ -79,7 +80,7 @@ const Products = () => {
           <SlidersHorizontal size={15} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
           <select
             value={category}
-            onChange={(event) => setCategory(event.target.value)}
+            onChange={changeFilter(setCategory)}
             className={selectClass}
           >
             <option value="">All categories</option>
@@ -96,7 +97,7 @@ const Products = () => {
           <ArrowDownAZ size={15} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
           <select
             value={sortBy}
-            onChange={(event) => setSortBy(event.target.value)}
+            onChange={changeFilter(setSortBy)}
             className={selectClass}
           >
             {SORT_OPTIONS.map((option) => (
@@ -111,7 +112,7 @@ const Products = () => {
 
       {!loading && !error && (
         <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
-          {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'} found
+          {total} {total === 1 ? 'product' : 'products'} found
         </p>
       )}
 
@@ -134,19 +135,45 @@ const Products = () => {
 
       {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
 
-      {!loading && !error && sortedProducts.length === 0 && (
+      {!loading && !error && products.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 py-16 text-center dark:border-slate-700">
           <PackageSearch size={32} className="text-slate-300 dark:text-slate-700" />
           <p className="text-sm text-slate-500 dark:text-slate-400">No products found.</p>
         </div>
       )}
 
-      {!loading && !error && sortedProducts.length > 0 && (
+      {!loading && !error && products.length > 0 && (
         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4">
-          {sortedProducts.map((product) => (
+          {products.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>
+      )}
+
+      {!loading && !error && pageCount > 1 && (
+        <nav aria-label="Pagination" className="mt-8 flex items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => setPage((value) => value - 1)}
+            disabled={page === 1}
+            className="flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            <ChevronLeft size={15} />
+            Previous
+          </button>
+          <span className="text-sm text-slate-500 dark:text-slate-400">
+            Page {page} of {pageCount}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPage((value) => value + 1)}
+            disabled={page >= pageCount}
+            className="flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            Next
+            <ChevronRight size={15} />
+          </button>
+        </nav>
       )}
     </div>
   )

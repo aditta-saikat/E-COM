@@ -6,6 +6,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
 import RoleRoute from './components/RoleRoute'
+import StorefrontRoute from './components/StorefrontRoute'
 import LoadingScreen from './components/LoadingScreen'
 import { useTheme } from './context/ThemeContext'
 
@@ -39,8 +40,22 @@ const App = () => {
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
+            <Route
+              path="/products"
+              element={
+                <StorefrontRoute>
+                  <Products />
+                </StorefrontRoute>
+              }
+            />
+            <Route
+              path="/products/:id"
+              element={
+                <StorefrontRoute>
+                  <ProductDetail />
+                </StorefrontRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route
@@ -103,7 +118,9 @@ const App = () => {
               path="/cart"
               element={
                 <ProtectedRoute>
-                  <Cart />
+                  <StorefrontRoute>
+                    <Cart />
+                  </StorefrontRoute>
                 </ProtectedRoute>
               }
             />
@@ -111,7 +128,9 @@ const App = () => {
               path="/checkout"
               element={
                 <ProtectedRoute>
-                  <Checkout />
+                  <StorefrontRoute>
+                    <Checkout />
+                  </StorefrontRoute>
                 </ProtectedRoute>
               }
             />

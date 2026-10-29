@@ -6,6 +6,7 @@ import 'feral-blinds/blinds.css'
 import { useAuth } from '../context/AuthContext'
 import { listProducts } from '../api/products'
 import { formatPrice } from '../lib/formatPrice'
+import ShopBusiness from '../components/ShopBusiness'
 
 const TONES = {
   indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300',
@@ -50,7 +51,6 @@ const QUICK_LINKS_BY_ROLE = {
     PROFILE,
   ],
   shop_admin: [
-    BROWSE,
     { to: '/my-shop', title: 'My shop', description: 'View and edit your shop details.', icon: Store, tone: 'cyan' },
     { to: '/my-products', title: 'My products', description: 'Create, edit or remove your listings.', icon: Package, tone: 'violet' },
     PROFILE,
@@ -118,7 +118,9 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {recentProducts.length > 0 && (
+      {role === 'shop_admin' && <ShopBusiness />}
+
+      {role !== 'shop_admin' && recentProducts.length > 0 && (
         <div className="mt-12 animate-fade-in-up">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-lg font-bold text-slate-900 dark:text-slate-100">Recently added</h2>
