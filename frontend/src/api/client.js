@@ -17,7 +17,10 @@ const createServiceClient = (baseURL) => {
   return client
 }
 
-export const authClient = createServiceClient(import.meta.env.VITE_AUTH_SERVICE_URL)
-export const catalogClient = createServiceClient(import.meta.env.VITE_PRODUCT_CATALOG_URL)
-export const cartClient = createServiceClient(import.meta.env.VITE_CART_SERVICE_URL)
-export const orderClient = createServiceClient(import.meta.env.VITE_ORDER_SERVICE_URL)
+// Every request goes through the API gateway, which routes it to the right service by URL prefix.
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
+export const authClient = createServiceClient(API_URL)
+export const catalogClient = createServiceClient(API_URL)
+export const cartClient = createServiceClient(API_URL)
+export const orderClient = createServiceClient(API_URL)

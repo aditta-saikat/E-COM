@@ -16,10 +16,7 @@ npm run build
 
 | Variable | Description |
 | --- | --- |
-| `VITE_AUTH_SERVICE_URL` | e.g. `http://localhost:3001` |
-| `VITE_PRODUCT_CATALOG_URL` | e.g. `http://localhost:3002` |
-| `VITE_CART_SERVICE_URL` | e.g. `http://localhost:3003` |
-| `VITE_ORDER_SERVICE_URL` | e.g. `http://localhost:3004` |
+| `VITE_API_URL` | The API gateway, e.g. `http://localhost:3000`. The only backend URL the browser uses; the gateway routes by path (`/api/auth`, `/api/products`, `/api/cart`, `/api/orders`, ...). |
 | `VITE_IMGBB_API_KEY` | ImgBB key for image uploads (https://api.imgbb.com/) |
 
 Anything prefixed `VITE_` is bundled into the browser code, so the ImgBB key is visible to users. Acceptable for a learning project. For production, proxy uploads through a backend.

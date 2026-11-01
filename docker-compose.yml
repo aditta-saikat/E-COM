@@ -98,19 +98,35 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_AUTH_SERVICE_URL: http://localhost:3001
-        VITE_PRODUCT_CATALOG_URL: http://localhost:3002
-        VITE_CART_SERVICE_URL: http://localhost:3003
-        VITE_ORDER_SERVICE_URL: http://localhost:3004
+        VITE_API_URL: http://localhost:3000
         VITE_IMGBB_API_KEY: ${VITE_IMGBB_API_KEY:-}
     restart: unless-stopped
     ports:
       - "5173:80"
     depends_on:
+      - gateway-service
+
+  gateway-service:
+    build: ./gateway-service
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      CORS_ORIGINS: http://localhost:5173
+      AUTH_SERVICE_URL: http://auth-service:3001
+      PRODUCT_CATALOG_URL: http://product-catalog-service:3002
+      CART_SERVICE_URL: http://cart-service:3003
+      ORDER_SERVICE_URL: http://order-service:3004
+      PAYMENT_SERVICE_URL: http://payment-service:3005
+    depends_on:
       - auth-service
       - product-catalog-service
       - cart-service
       - order-service
+      - payment-service
 
 volumes:
   mongo-data:

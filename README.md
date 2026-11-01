@@ -11,9 +11,10 @@ A learning-project marketplace built as microservices. Customers browse and buy,
 | [cart-service](cart-service/README.md) | 3003 | Per-user cart, hydrated with live product data | [README](cart-service/README.md) |
 | [order-service](order-service/README.md) | 3004 | Checkout orchestration, order history | [README](order-service/README.md) |
 | [payment-service](payment-service/README.md) | 3005 | Charges (mock provider), payment records | [README](payment-service/README.md) |
+| [gateway-service](gateway-service/README.md) | 3000 | API gateway: the single public entry point. Routing, access control, rate limiting, safe logging | [README](gateway-service/README.md) |
 | [frontend](frontend/README.md) | 5173 | React + Vite single-page app | [README](frontend/README.md) |
 
-Every backend is Express 5 + Mongoose, logs with pino, and exposes `GET /health`.
+The browser only talks to the **gateway** (`http://localhost:3000`); it routes each request to the right service and keeps the internal service-to-service endpoints off the public internet. Every backend is Express 5, logs with pino, and exposes `GET /health`.
 
 ### How services talk to each other
 
@@ -79,10 +80,10 @@ cp .env.example .env      # set JWT_SECRET and INTERNAL_API_KEY (and optionally 
 docker compose up --build # or: npm run docker:up
 ```
 
-- The frontend is on http://localhost:5173 and the services on ports 3001 to 3005. Services call each other by name (e.g. `http://auth-service:3001`).
+- The frontend is on http://localhost:5173, the gateway on http://localhost:3000 and the services on ports 3001 to 3005. Services call each other by name (e.g. `http://auth-service:3001`).
 - Docker does **not** read the per-service `.env` files. Configuration comes from `docker-compose.yml` and the root `.env`.
 - Services run with `NODE_ENV=production` (the dev-only `pino-pretty` logger is not installed in the images).
-- The frontend's `VITE_*` URLs are baked in at build time, so rebuild (`docker compose up --build`) after changing them.
+- The frontend's `VITE_API_URL` is baked in at build time, so rebuild (`docker compose up --build`) after changing it.
 - Data lives in the `mongo-data` volume. `docker compose down -v` deletes it.
 
 ### Manual (one terminal per service)
@@ -93,6 +94,7 @@ cd product-catalog-service && npm install && npm run dev # 3002
 cd cart-service && npm install && npm run dev            # 3003
 cd order-service && npm install && npm run dev           # 3004
 cd payment-service && npm install && npm run dev         # 3005
+cd gateway-service && npm install && npm run dev         # 3000
 cd frontend && npm install && npm run dev                # 5173
 ```
 

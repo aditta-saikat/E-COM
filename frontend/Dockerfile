@@ -8,10 +8,7 @@ RUN npm ci
 COPY . .
 
 # Vite inlines VITE_* values at build time, so they are passed as build args.
-ARG VITE_AUTH_SERVICE_URL=http://localhost:3001
-ARG VITE_PRODUCT_CATALOG_URL=http://localhost:3002
-ARG VITE_CART_SERVICE_URL=http://localhost:3003
-ARG VITE_ORDER_SERVICE_URL=http://localhost:3004
+ARG VITE_API_URL=http://localhost:3000
 ARG VITE_IMGBB_API_KEY=
 RUN npm run build
 
