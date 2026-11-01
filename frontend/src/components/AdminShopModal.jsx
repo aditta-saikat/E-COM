@@ -12,12 +12,14 @@ import {
   ShoppingCart,
   Store,
   User,
+  Wallet,
   X,
   XCircle,
 } from 'lucide-react'
 import Modal from './Modal'
 import OrdersTable from './OrdersTable'
 import AdminCartsTable from './AdminCartsTable'
+import ShopBilling from './ShopBilling'
 import { listProducts } from '../api/products'
 import { listAllOrders } from '../api/orders'
 import { listAllCarts } from '../api/cart'
@@ -33,6 +35,7 @@ const TABS = [
   { key: 'products', label: 'Products', icon: Package },
   { key: 'orders', label: 'Orders', icon: ReceiptText },
   { key: 'carts', label: 'Carts', icon: ShoppingCart },
+  { key: 'billing', label: 'Billing', icon: Wallet },
 ]
 
 const MAX_PAGES = 50
@@ -189,7 +192,7 @@ const AdminShopModal = ({ shop, onClose, onApprove, onReject }) => {
     }
 
     if (products === null) load('products', () => fetchAllProducts(shopId), setProducts)
-    if (tab === 'orders' && orders === null) load('orders', () => listAllOrders({ shopId }).then((data) => data.items), setOrders)
+    if ((tab === 'orders' || tab === 'billing') && orders === null) load('orders', () => listAllOrders({ shopId }).then((data) => data.items), setOrders)
     if (tab === 'carts' && carts === null) load('carts', () => listAllCarts({ shopId }).then((data) => data.items), setCarts)
 
     return () => {
@@ -277,6 +280,11 @@ const AdminShopModal = ({ shop, onClose, onApprove, onReject }) => {
           {tab === 'orders' && (
             <TabState loading={orders === null} failed={failed.orders}>
               <OrdersTable orders={orders || []} emptyMessage="This shop has no orders yet." />
+            </TabState>
+          )}
+          {tab === 'billing' && (
+            <TabState loading={orders === null} failed={failed.orders}>
+              <ShopBilling orders={orders || []} shopId={shop._id} />
             </TabState>
           )}
           {tab === 'carts' && (
